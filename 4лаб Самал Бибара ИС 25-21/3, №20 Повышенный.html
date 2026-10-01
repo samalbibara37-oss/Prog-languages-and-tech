@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Мини-мастер регистрации</title>
+
+    <style>
+        .step {
+            display: none;
+        }
+
+        .step.active {
+            display: block;
+        }
+
+        input {
+            display: block;
+            margin: 10px 0;
+            padding: 8px;
+        }
+
+        button {
+            margin: 5px;
+            padding: 8px 15px;
+        }
+
+        #message {
+            color: red;
+        }
+
+        #summary {
+            background: #f0f0f0;
+            padding: 15px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+
+<h2>Мини-мастер регистрации</h2>
+
+<!-- Блок 1 -->
+<div id="step1" class="step active">
+    <h3>1. Личные данные</h3>
+
+    <input id="name" type="text" placeholder="ФИО">
+    <input id="birthDate" type="date">
+
+    <button type="button" onclick="nextStep()">
+        Далее
+    </button>
+</div>
+
+<!-- Блок 2 -->
+<div id="step2" class="step">
+    <h3>2. Параметры аккаунта</h3>
+
+    <input id="login" type="text" placeholder="Логин">
+    <input id="email" type="email" placeholder="E-mail">
+    <input id="password" type="password" placeholder="Пароль">
+
+    <button type="button" onclick="previousStep()">
+        Назад
+    </button>
+
+    <button type="button" onclick="finishRegistration()">
+        Завершить регистрацию
+    </button>
+</div>
+
+<p id="message"></p>
+
+<!-- Итоговое резюме -->
+<div id="summary"></div>
+
+<script>
+let currentStep = 1;
+
+const message = document.getElementById('message');
+const summary = document.getElementById('summary');
+
+function showStep(step) {
+    document.getElementById('step1').classList.remove('active');
+    document.getElementById('step2').classList.remove('active');
+
+    document.getElementById('step' + step).classList.add('active');
+
+    message.textContent = '';
+}
+
+// Проверка первого блока
+function nextStep() {
+    const name = document.getElementById('name').value.trim();
+    const birthDate = document.getElementById('birthDate').value;
+
+    if (name === '') {
+        message.textContent = 'Введите ФИО';
+        return;
+    }
+
+    if (birthDate === '') {
+        message.textContent = 'Укажите дату рождения';
+        return;
+    }
+
+    currentStep = 2;
+    showStep(currentStep);
+}
+
+// Возврат к первому блоку
+function previousStep() {
+    currentStep = 1;
+    showStep(currentStep);
+}
+
+// Проверка второго блока и вывод результата
+function finishRegistration() {
+    const login = document.getElementById('login').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+
+    if (login === '') {
+        message.textContent = 'Введите логин';
+        return;
+    }
+
+    if (email === '') {
+        message.textContent = 'Введите e-mail';
+        return;
+    }
+
+    if (password.length < 8) {
+        message.textContent =
+            'Пароль должен содержать минимум 8 символов';
+        return;
+    }
+
+    message.textContent = '';
+
+    const name = document.getElementById('name').value;
+    const birthDate = document.getElementById('birthDate').value;
+
+    summary.innerHTML = `
+        <h3>Регистрация завершена!</h3>
+        <p><strong>ФИО:</strong> ${name}</p>
+        <p><strong>Дата рождения:</strong> ${birthDate}</p>
+        <p><strong>Логин:</strong> ${login}</p>
+        <p><strong>E-mail:</strong> ${email}</p>
+        <p><strong>Пароль:</strong> ********</p>
+    `;
+
+    document.getElementById('step2').classList.remove('active');
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Регистрация студента</title>
+</head>
+<body>
+
+<form id="studentForm">
+    <h2>Регистрация студента</h2>
+
+    <input id="name" type="text" placeholder="ФИО">
+
+    <input id="email" type="email" placeholder="E-mail">
+
+    <select id="course">
+        <option value="">Выберите курс</option>
+        <option value="1">1 курс</option>
+        <option value="2">2 курс</option>
+        <option value="3">3 курс</option>
+        <option value="4">4 курс</option>
+    </select>
+
+    <label>
+        <input id="agree" type="checkbox">
+        Согласен с правилами
+    </label>
+
+    <button type="submit">Зарегистрироваться</button>
+</form>
+
+<p id="message"></p>
+
+<script>
+const form = document.getElementById('studentForm');
+
+form.addEventListener('submit', function(event) {
+    event.preventDefault();
+
+    const name = document.getElementById('name').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const course = document.getElementById('course').value;
+    const agree = document.getElementById('agree').checked;
+    const message = document.getElementById('message');
+
+    if (name === '') {
+        message.textContent = 'Введите ФИО';
+        return;
+    }
+
+    if (email === '') {
+        message.textContent = 'Введите e-mail';
+        return;
+    }
+
+    if (course === '') {
+        message.textContent = 'Выберите курс';
+        return;
+    }
+
+    if (!agree) {
+        message.textContent = 'Подтвердите согласие с правилами';
+        return;
+    }
+
+    message.textContent = 'Форма заполнена корректно!';
+});
+</script>
+
+</body>
+</html>

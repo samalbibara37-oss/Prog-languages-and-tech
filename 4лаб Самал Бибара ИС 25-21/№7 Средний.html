@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Проверка пароля</title>
+</head>
+<body>
+
+<h2>Регистрация</h2>
+
+<label for="password">Пароль:</label>
+<input id="password" type="password" placeholder="Введите пароль">
+
+<p>Требования к паролю:</p>
+<ul>
+    <li id="length">❌ Минимум 8 символов</li>
+    <li id="digit">❌ Должна быть хотя бы одна цифра</li>
+</ul>
+
+<p id="message"></p>
+
+<script>
+const password = document.getElementById('password');
+const length = document.getElementById('length');
+const digit = document.getElementById('digit');
+const message = document.getElementById('message');
+
+password.addEventListener('input', function() {
+    const value = password.value;
+
+    // Проверка длины
+    if (value.length >= 8) {
+        length.textContent = '✅ Минимум 8 символов';
+    } else {
+        length.textContent = '❌ Минимум 8 символов';
+    }
+
+    // Проверка наличия цифры
+    if (/\d/.test(value)) {
+        digit.textContent = '✅ Должна быть хотя бы одна цифра';
+    } else {
+        digit.textContent = '❌ Должна быть хотя бы одна цифра';
+    }
+
+    // Итоговое сообщение
+    if (value.length >= 8 && /\d/.test(value)) {
+        message.textContent = 'Пароль соответствует требованиям';
+    } else {
+        message.textContent = 'Пароль не соответствует требованиям';
+    }
+});
+</script>
+
+</body>
+</html>
