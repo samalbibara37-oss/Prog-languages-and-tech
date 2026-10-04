@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Мини-калькулятор</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+        }
+
+        input {
+            width: 120px;
+            padding: 8px;
+            margin: 5px;
+        }
+
+        button {
+            padding: 8px 12px;
+            margin: 5px;
+            cursor: pointer;
+        }
+
+        #result {
+            margin-top: 20px;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .error {
+            color: red;
+        }
+
+        .success {
+            color: green;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Мини-калькулятор</h1>
+
+    <input type="number" id="number1" placeholder="Первое число">
+    <input type="number" id="number2" placeholder="Второе число">
+
+    <br>
+
+    <button id="add">Сложить</button>
+    <button id="subtract">Вычесть</button>
+    <button id="multiply">Умножить</button>
+    <button id="divide">Разделить</button>
+
+    <div id="result">Результат появится здесь</div>
+
+    <script src="script.js"></script>
+</body>
