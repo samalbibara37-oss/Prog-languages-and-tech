@@ -1,2 +1,0 @@
-# Technology-of-programming
-Лабы
