@@ -1,0 +1,139 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f2f4f7;
+}
+
+.container {
+    width: 700px;
+    margin: 50px auto;
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.cart {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.12);
+}
+
+.cart-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px 0;
+    border-bottom: 1px solid #ddd;
+}
+
+.product-info {
+    flex: 1;
+}
+
+.product-name {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.product-price {
+    color: #666;
+    margin-top: 5px;
+}
+
+.quantity {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 20px;
+}
+
+.quantity button {
+    width: 32px;
+    height: 32px;
+    border: none;
+    border-radius: 5px;
+    background: #007bff;
+    color: white;
+    font-size: 18px;
+    cursor: pointer;
+}
+
+.quantity button:hover {
+    background: #0056b3;
+}
+
+.quantity span {
+    width: 30px;
+    text-align: center;
+    font-weight: bold;
+}
+
+.item-total {
+    width: 100px;
+    text-align: right;
+    font-weight: bold;
+}
+
+.delete-btn {
+    margin-left: 15px;
+    border: none;
+    background: #dc3545;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.delete-btn:hover {
+    background: #b02a37;
+}
+
+.cart-summary {
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 2px solid #ddd;
+}
+
+.cart-summary p {
+    font-size: 18px;
+}
+
+.total {
+    font-size: 24px !important;
+}
+
+#clearCart {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 6px;
+    background: #6c757d;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+#clearCart:hover {
+    background: #545b62;
+}
+
+#message {
+    text-align: center;
+    margin-top: 15px;
+    color: #28a745;
+    font-weight: bold;
+}
+
+.empty {
+    text-align: center;
+    padding: 30px;
+    color: #777;
+    font-size: 18px;
+}

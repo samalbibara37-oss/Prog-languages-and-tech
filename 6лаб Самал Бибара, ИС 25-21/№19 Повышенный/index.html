@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Корзина интернет-магазина</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="container">
+
+        <h1>Корзина интернет-магазина</h1>
+
+        <div class="cart">
+            <div id="cartItems"></div>
+
+            <div class="cart-summary">
+                <p>
+                    Количество товаров:
+                    <strong id="totalQuantity">0</strong>
+                </p>
+
+                <p class="total">
+                    Итого:
+                    <strong id="totalPrice">0 ₸</strong>
+                </p>
+
+                <button id="clearCart">Очистить корзину</button>
+            </div>
+        </div>
+
+        <p id="message"></p>
+
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

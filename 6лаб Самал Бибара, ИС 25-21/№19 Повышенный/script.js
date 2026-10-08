@@ -1,0 +1,160 @@
+const cartItems = document.querySelector("#cartItems");
+const totalQuantity = document.querySelector("#totalQuantity");
+const totalPrice = document.querySelector("#totalPrice");
+const clearCart = document.querySelector("#clearCart");
+const message = document.querySelector("#message");
+
+// Товары в корзине
+let products = [
+    {
+        id: 1,
+        name: "Ноутбук Lenovo",
+        price: 250000,
+        quantity: 1
+    },
+    {
+        id: 2,
+        name: "Мышь Logitech",
+        price: 15000,
+        quantity: 2
+    },
+    {
+        id: 3,
+        name: "Клавиатура Redragon",
+        price: 25000,
+        quantity: 1
+    }
+];
+
+// Отображение корзины
+function renderCart() {
+
+    cartItems.textContent = "";
+
+    if (products.length === 0) {
+        const empty = document.createElement("div");
+        empty.classList.add("empty");
+        empty.textContent = "Корзина пуста";
+        cartItems.append(empty);
+
+        totalQuantity.textContent = "0";
+        totalPrice.textContent = "0 ₸";
+
+        return;
+    }
+
+    let quantitySum = 0;
+    let priceSum = 0;
+
+    products.forEach(function(product) {
+
+        const item = document.createElement("div");
+        item.classList.add("cart-item");
+
+        const productInfo = document.createElement("div");
+        productInfo.classList.add("product-info");
+
+        const name = document.createElement("div");
+        name.classList.add("product-name");
+        name.textContent = product.name;
+
+        const price = document.createElement("div");
+        price.classList.add("product-price");
+        price.textContent = product.price.toLocaleString("ru-RU") + " ₸";
+
+        productInfo.append(name);
+        productInfo.append(price);
+
+        // Блок изменения количества
+        const quantityBlock = document.createElement("div");
+        quantityBlock.classList.add("quantity");
+
+        const minusBtn = document.createElement("button");
+        minusBtn.textContent = "-";
+
+        const quantity = document.createElement("span");
+        quantity.textContent = product.quantity;
+
+        const plusBtn = document.createElement("button");
+        plusBtn.textContent = "+";
+
+        // Уменьшение количества
+        minusBtn.addEventListener("click", function() {
+
+            if (product.quantity > 1) {
+                product.quantity--;
+                renderCart();
+
+                message.textContent = "Количество товара изменено";
+            }
+        });
+
+        // Увеличение количества
+        plusBtn.addEventListener("click", function() {
+
+            product.quantity++;
+            renderCart();
+
+            message.textContent = "Количество товара изменено";
+        });
+
+        quantityBlock.append(minusBtn);
+        quantityBlock.append(quantity);
+        quantityBlock.append(plusBtn);
+
+        // Общая стоимость конкретного товара
+        const itemTotal = document.createElement("div");
+        itemTotal.classList.add("item-total");
+
+        const productTotal = product.price * product.quantity;
+
+        itemTotal.textContent =
+            productTotal.toLocaleString("ru-RU") + " ₸";
+
+        // Кнопка удаления
+        const deleteBtn = document.createElement("button");
+        deleteBtn.classList.add("delete-btn");
+        deleteBtn.textContent = "Удалить";
+
+        deleteBtn.addEventListener("click", function() {
+
+            products = products.filter(function(item) {
+                return item.id !== product.id;
+            });
+
+            renderCart();
+
+            message.textContent = "Товар удалён из корзины";
+        });
+
+        item.append(productInfo);
+        item.append(quantityBlock);
+        item.append(itemTotal);
+        item.append(deleteBtn);
+
+        cartItems.append(item);
+
+        quantitySum += product.quantity;
+        priceSum += productTotal;
+    });
+
+    // Пересчёт общего количества
+    totalQuantity.textContent = quantitySum;
+
+    // Пересчёт общей стоимости
+    totalPrice.textContent =
+        priceSum.toLocaleString("ru-RU") + " ₸";
+}
+
+// Очистить всю корзину
+clearCart.addEventListener("click", function() {
+
+    products = [];
+
+    renderCart();
+
+    message.textContent = "Корзина очищена";
+});
+
+// Первый вывод корзины
+renderCart();
