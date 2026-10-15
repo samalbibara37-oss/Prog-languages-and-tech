@@ -1,0 +1,122 @@
+
+const facultyData = {
+    news: [
+        {
+            title: "Олимпиада по программированию",
+            date: "10.10.2026",
+            text: "Студенты факультета приняли участие в олимпиаде по программированию и решению алгоритмических задач."
+        },
+        {
+            title: "Новые компьютерные лаборатории",
+            date: "08.10.2026",
+            text: "На факультете открылись новые компьютерные лаборатории для практических занятий по информационным технологиям."
+        },
+        {
+            title: "Успехи студентов",
+            date: "05.10.2026",
+            text: "Студенты факультета заняли призовые места в конкурсе научных проектов."
+        }
+    ],
+
+    events: [
+        {
+            title: "День открытых дверей",
+            date: "20.10.2026",
+            text: "Приглашаем студентов и абитуриентов познакомиться с факультетом, преподавателями и образовательными программами."
+        },
+        {
+            title: "Мастер-класс по JavaScript",
+            date: "22.10.2026",
+            text: "Практический мастер-класс по созданию интерактивных веб-приложений и работе с JavaScript."
+        },
+        {
+            title: "Студенческая конференция",
+            date: "25.10.2026",
+            text: "Научная конференция, посвящённая современным информационным технологиям и искусственному интеллекту."
+        }
+    ],
+
+    announcements: [
+        {
+            title: "Расписание занятий",
+            date: "12.10.2026",
+            text: "Обновлённое расписание занятий доступно студентам. Проверьте время и аудитории своих пар."
+        },
+        {
+            title: "Сдача лабораторных работ",
+            date: "14.10.2026",
+            text: "Напоминаем о необходимости своевременно сдать лабораторные работы преподавателям."
+        },
+        {
+            title: "Стипендия",
+            date: "15.10.2026",
+            text: "Студентам необходимо проверить информацию о стипендии и своевременно предоставить требуемые документы."
+        }
+    ]
+};
+
+const content = document.getElementById("content");
+const tabs = document.querySelectorAll(".tab");
+const searchInput = document.getElementById("searchInput");
+const searchButton = document.getElementById("searchButton");
+const resetButton = document.getElementById("resetButton");
+
+let currentTab = "news";
+
+function renderMaterials() {
+    const keyword = searchInput.value.trim().toLowerCase();
+
+    const filteredData = facultyData[currentTab].filter(item => {
+        const text = (
+            item.title + " " +
+            item.date + " " +
+            item.text
+        ).toLowerCase();
+
+        return text.includes(keyword);
+    });
+
+    if (filteredData.length === 0) {
+        content.innerHTML =
+            '<p class="empty">Материалы не найдены.</p>';
+        return;
+    }
+
+    content.innerHTML = filteredData.map(item => `
+        <article class="card">
+            <h3>${item.title}</h3>
+            <small>Дата: ${item.date}</small>
+            <p>${item.text}</p>
+        </article>
+    `).join("");
+}
+
+function switchTab(tabName) {
+    currentTab = tabName;
+
+    tabs.forEach(tab => {
+        tab.classList.toggle(
+            "active",
+            tab.dataset.tab === tabName
+        );
+    });
+
+    renderMaterials();
+}
+
+tabs.forEach(tab => {
+    tab.addEventListener("click", () => {
+        switchTab(tab.dataset.tab);
+    });
+});
+
+searchButton.addEventListener("click", renderMaterials);
+
+searchInput.addEventListener("input", renderMaterials);
+
+resetButton.addEventListener("click", () => {
+    searchInput.value = "";
+    renderMaterials();
+});
+
+switchTab("news");

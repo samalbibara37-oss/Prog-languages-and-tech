@@ -1,0 +1,58 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Панель заказов</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <main class="container">
+        <header>
+            <h1>Панель заказов</h1>
+            <p>Управление заказами и их статусами</p>
+        </header>
+
+        <section class="statistics">
+            <div class="stat-card">
+                <span>Всего заказов</span>
+                <strong id="totalCount">0</strong>
+            </div>
+            <div class="stat-card">
+                <span>Новые</span>
+                <strong id="newCount">0</strong>
+            </div>
+            <div class="stat-card">
+                <span>В работе</span>
+                <strong id="workCount">0</strong>
+            </div>
+            <div class="stat-card">
+                <span>Готовые</span>
+                <strong id="readyCount">0</strong>
+            </div>
+        </section>
+
+        <nav class="tabs">
+            <button class="tab active" data-status="new">
+                Новые <span id="badge-new">0</span>
+            </button>
+            <button class="tab" data-status="work">
+                В работе <span id="badge-work">0</span>
+            </button>
+            <button class="tab" data-status="ready">
+                Готовые <span id="badge-ready">0</span>
+            </button>
+        </nav>
+
+        <section id="orders" class="orders"></section>
+
+        <p id="emptyMessage" class="empty" hidden>
+            В этой категории пока нет заказов.
+        </p>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

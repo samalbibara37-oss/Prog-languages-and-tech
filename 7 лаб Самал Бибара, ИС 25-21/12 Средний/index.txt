@@ -1,0 +1,45 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Новости факультета</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <main class="container">
+        <header>
+            <h1>Новости факультета</h1>
+            <p>Новости, события и объявления для студентов</p>
+        </header>
+
+        <nav class="tabs">
+            <button class="tab active" data-tab="news">
+                Новости
+            </button>
+            <button class="tab" data-tab="events">
+                События
+            </button>
+            <button class="tab" data-tab="announcements">
+                Объявления
+            </button>
+        </nav>
+
+        <div class="search">
+            <input
+                type="text"
+                id="searchInput"
+                placeholder="Введите ключевое слово..."
+            >
+            <button id="searchButton">Найти</button>
+            <button id="resetButton">Сбросить</button>
+        </div>
+
+        <section id="content" class="content"></section>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

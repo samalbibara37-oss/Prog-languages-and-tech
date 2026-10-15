@@ -1,0 +1,62 @@
+
+const student = {
+    about: {
+        title: "О себе",
+        content: `
+            <p><strong>Имя:</strong> Самал</p>
+            <p><strong>Статус:</strong> Студентка</p>
+            <p><strong>Специальность:</strong> Информационные системы</p>
+            <p>Изучаю программирование и современные технологии.
+            Хочу развивать свои навыки и получать новые знания.</p>
+        `
+    },
+
+    skills: {
+        title: "Мои навыки",
+        content: `
+            <ul>
+                <li>HTML — создание структуры сайтов</li>
+                <li>CSS — оформление веб-страниц</li>
+                <li>JavaScript — интерактивность</li>
+                <li>Python — основы программирования</li>
+                <li>SQL — работа с базами данных</li>
+            </ul>
+        `
+    },
+
+    contacts: {
+        title: "Контакты",
+        content: `
+            <p><strong>Email:</strong> samalbibara37@gmail.com</p>
+            <p><strong>Город:</strong> Алматы</p>
+            <p><strong>Связь:</strong> Электронная почта</p>
+        `
+    }
+};
+
+const content = document.getElementById("content");
+const tabs = document.querySelectorAll(".tab");
+
+function showTab(tabName) {
+    const data = student[tabName];
+
+    content.innerHTML = `
+        <h2>${data.title}</h2>
+        ${data.content}
+    `;
+
+    tabs.forEach(tab => {
+        tab.classList.toggle(
+            "active",
+            tab.dataset.tab === tabName
+        );
+    });
+}
+
+tabs.forEach(tab => {
+    tab.addEventListener("click", () => {
+        showTab(tab.dataset.tab);
+    });
+});
+
+showTab("about");
