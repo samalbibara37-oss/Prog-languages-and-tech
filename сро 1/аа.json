@@ -1,0 +1,13 @@
+{
+  "id": "tsk_7f3a91",
+  "title": "Решить 12 задач по рядам Фурье",
+  "subject": "Математический анализ",
+  "type": "homework",
+  "priority": "high",
+  "status": "in_progress",
+  "deadline": "2025-02-14",
+  "estimateHours": 3,
+  "description": "Глава 8, задачи 8.1–8.12",
+  "createdAt": "2025-02-08T09:12:00Z",
+  "updatedAt": "2025-02-10T18:40:00Z"
+}

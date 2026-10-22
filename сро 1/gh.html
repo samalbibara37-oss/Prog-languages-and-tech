@@ -1,0 +1,2062 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>StudyFlow — планировщик учебных задач</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   БАЗА
+   ============================================================ */
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth}
+:root{
+  --bg:#f5f7fb;
+  --surface:#ffffff;
+  --ink:#0f172a;
+  --ink2:#475569;
+  --ink3:#94a3b8;
+  --line:#e5e9f2;
+  --brand:#4f46e5;
+  --brand2:#7c3aed;
+  --brand-soft:#eef2ff;
+  --ok:#10b981;
+  --warn:#f59e0b;
+  --danger:#ef4444;
+  --info:#0ea5e9;
+  --r-lg:20px;
+  --r-md:14px;
+  --r-sm:10px;
+  --shadow-sm:0 1px 2px rgba(15,23,42,0.06),0 1px 3px rgba(15,23,42,0.05);
+  --shadow-md:0 6px 18px -6px rgba(15,23,42,0.14),0 2px 6px rgba(15,23,42,0.05);
+  --shadow-lg:0 28px 60px -20px rgba(15,23,42,0.32);
+}
+body{
+  margin:0;
+  font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;
+  background:var(--bg);
+  color:var(--ink);
+  line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+}
+h1,h2,h3,h4,h5{margin:0;line-height:1.2;letter-spacing:-0.02em}
+p{margin:0}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+input,select,textarea{font-family:inherit;font-size:14px}
+a{color:inherit}
+.wrap{max-width:1280px;margin:0 auto;padding:0 24px}
+section{scroll-margin-top:88px}
+
+/* ============================================================
+   ХЕДЕР
+   ============================================================ */
+.topbar{
+  position:sticky;top:0;z-index:60;
+  background:rgba(255,255,255,0.82);
+  backdrop-filter:blur(14px) saturate(180%);
+  -webkit-backdrop-filter:blur(14px) saturate(180%);
+  border-bottom:1px solid var(--line);
+}
+.topbar-inner{max-width:1280px;margin:0 auto;padding:0 24px;height:66px;display:flex;align-items:center;gap:20px}
+.logo{display:flex;align-items:center;gap:11px;text-decoration:none;font-weight:800;font-size:16.5px;letter-spacing:-0.03em;white-space:nowrap}
+.logo-mark{
+  width:36px;height:36px;border-radius:11px;flex:none;
+  background:linear-gradient(135deg,#4f46e5,#7c3aed 55%,#a855f7);
+  display:grid;place-items:center;color:#fff;
+  box-shadow:0 6px 16px -6px rgba(79,70,229,0.75);
+}
+.logo-mark svg{width:19px;height:19px}
+.logo small{display:block;font-size:10.5px;font-weight:600;color:var(--ink3);letter-spacing:0.09em;text-transform:uppercase;margin-top:-2px}
+.nav{margin-left:auto;display:flex;gap:2px;flex-wrap:wrap}
+.nav a{
+  text-decoration:none;font-size:13.5px;font-weight:600;color:var(--ink2);
+  padding:8px 13px;border-radius:9px;transition:0.16s;
+}
+.nav a:hover{background:var(--brand-soft);color:var(--brand)}
+.nav a.cta{background:var(--ink);color:#fff}
+.nav a.cta:hover{background:var(--brand)}
+
+/* ============================================================
+   HERO
+   ============================================================ */
+.hero{
+  position:relative;overflow:hidden;color:#fff;
+  background:
+    radial-gradient(900px 380px at 12% -20%, rgba(99,102,241,0.85) 0%, transparent 62%),
+    radial-gradient(760px 420px at 92% 8%, rgba(168,85,247,0.55) 0%, transparent 60%),
+    linear-gradient(140deg,#0a1024 0%,#131b38 46%,#1c1747 100%);
+  padding:66px 0 74px;
+}
+.hero::before{
+  content:'';position:absolute;inset:0;opacity:0.35;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.055) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,0.055) 1px,transparent 1px);
+  background-size:52px 52px;
+  mask-image:radial-gradient(circle at 50% 0%,#000 25%,transparent 78%);
+  -webkit-mask-image:radial-gradient(circle at 50% 0%,#000 25%,transparent 78%);
+}
+.hero-inner{position:relative;z-index:2}
+.hero-badge{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:6px 14px 6px 8px;border-radius:999px;font-size:12.5px;font-weight:600;
+  background:rgba(255,255,255,0.09);border:1px solid rgba(255,255,255,0.16);
+  color:#c7d2fe;letter-spacing:0.01em;margin-bottom:22px;
+}
+.hero-badge b{
+  background:linear-gradient(135deg,#818cf8,#c084fc);color:#0a1024;
+  padding:2px 9px;border-radius:999px;font-size:11px;font-weight:800;letter-spacing:0.05em;
+}
+.hero h1{font-size:clamp(30px,4.4vw,52px);font-weight:800;letter-spacing:-0.035em;max-width:900px}
+.hero h1 em{
+  font-style:normal;
+  background:linear-gradient(100deg,#a5b4fc,#c084fc 45%,#67e8f9);
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+}
+.hero-sub{margin-top:18px;max-width:720px;font-size:16.5px;color:#b9c3d9;line-height:1.62}
+.hero-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:30px}
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  font-size:14px;font-weight:650;padding:11px 20px;border-radius:11px;
+  transition:0.17s;white-space:nowrap;
+}
+.btn svg{width:16px;height:16px;flex:none}
+.btn-primary{background:linear-gradient(135deg,#4f46e5,#7c3aed);color:#fff;box-shadow:0 12px 26px -12px rgba(124,58,237,0.95)}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 16px 32px -12px rgba(124,58,237,1)}
+.btn-light{background:#fff;color:#0f172a;box-shadow:var(--shadow-sm)}
+.btn-light:hover{transform:translateY(-1px);box-shadow:var(--shadow-md)}
+.btn-ghost{background:rgba(255,255,255,0.08);color:#e2e8f0;border:1px solid rgba(255,255,255,0.18)}
+.btn-ghost:hover{background:rgba(255,255,255,0.15)}
+.btn-soft{background:var(--brand-soft);color:var(--brand)}
+.btn-soft:hover{background:#e0e7ff}
+.btn-danger-soft{background:#fef2f2;color:#dc2626}
+.btn-danger-soft:hover{background:#fee2e2}
+.btn:active{transform:translateY(0)}
+
+.hero-metrics{
+  position:relative;z-index:2;margin-top:46px;
+  display:grid;grid-template-columns:repeat(4,1fr);gap:1px;
+  background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.13);
+  border-radius:var(--r-lg);overflow:hidden;
+  backdrop-filter:blur(8px);
+}
+.hero-metric{background:rgba(12,18,40,0.45);padding:20px 22px}
+.hero-metric strong{display:block;font-size:26px;font-weight:800;letter-spacing:-0.03em;color:#fff}
+.hero-metric span{font-size:12.5px;color:#93a1bf;font-weight:500}
+
+/* ============================================================
+   СЕКЦИИ
+   ============================================================ */
+.section{max-width:1280px;margin:0 auto;padding:62px 24px}
+.section + .section{padding-top:0}
+.eyebrow{
+  display:inline-flex;align-items:center;gap:8px;
+  font-size:11.5px;font-weight:800;letter-spacing:0.15em;text-transform:uppercase;
+  color:var(--brand);margin-bottom:12px;
+}
+.eyebrow::before{content:'';width:22px;height:2px;border-radius:2px;background:linear-gradient(90deg,var(--brand),var(--brand2))}
+.section-title{font-size:clamp(24px,2.6vw,32px);font-weight:800;letter-spacing:-0.03em}
+.section-lead{margin-top:12px;max-width:780px;color:var(--ink2);font-size:15.5px}
+.section-head{margin-bottom:32px}
+
+/* ---- персонажи ---- */
+.personas{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.persona{
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);
+  padding:26px;box-shadow:var(--shadow-sm);position:relative;overflow:hidden;
+  transition:0.2s;
+}
+.persona:hover{box-shadow:var(--shadow-md);transform:translateY(-2px);border-color:#d8dff0}
+.persona::after{
+  content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,var(--brand),var(--brand2));
+  opacity:0;transition:0.2s;
+}
+.persona:hover::after{opacity:1}
+.persona-ava{
+  width:52px;height:52px;border-radius:15px;display:grid;place-items:center;
+  font-weight:800;font-size:18px;color:#fff;margin-bottom:16px;letter-spacing:-0.02em;
+}
+.persona h4{font-size:16.5px;font-weight:750}
+.persona .role{font-size:12.5px;color:var(--ink3);font-weight:600;margin-top:3px}
+.persona .quote{
+  margin-top:14px;padding:12px 14px;border-radius:11px;background:#f8fafc;
+  border-left:3px solid var(--brand);font-size:13.5px;color:var(--ink2);font-style:italic;
+}
+.persona ul{margin:14px 0 0;padding:0;list-style:none;display:grid;gap:8px}
+.persona li{font-size:13.5px;color:var(--ink2);display:flex;gap:9px;align-items:flex-start}
+.persona li svg{width:15px;height:15px;flex:none;margin-top:3px;color:var(--ok)}
+.persona li b{color:var(--ink);font-weight:650}
+
+/* ---- сценарии ---- */
+.scenarios{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;margin-top:22px}
+.scenario{
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--r-md);
+  padding:22px 24px;box-shadow:var(--shadow-sm);
+}
+.scenario-head{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.scenario-num{
+  width:30px;height:30px;border-radius:9px;flex:none;display:grid;place-items:center;
+  background:var(--brand-soft);color:var(--brand);font-weight:800;font-size:13px;
+}
+.scenario h5{font-size:14.5px;font-weight:700}
+.scenario .who{font-size:11.5px;color:var(--ink3);font-weight:600}
+.steps{margin:0;padding:0;list-style:none;counter-reset:s;display:grid;gap:9px}
+.steps li{
+  counter-increment:s;position:relative;padding-left:26px;
+  font-size:13.3px;color:var(--ink2);line-height:1.5;
+}
+.steps li::before{
+  content:counter(s);position:absolute;left:0;top:1px;
+  width:18px;height:18px;border-radius:50%;display:grid;place-items:center;
+  background:#f1f5f9;color:var(--ink2);font-size:10.5px;font-weight:800;
+}
+
+/* ---- модель данных ---- */
+.model-grid{display:grid;grid-template-columns:1.35fr 1fr;gap:22px;align-items:start}
+.card-panel{
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);
+  box-shadow:var(--shadow-sm);overflow:hidden;
+}
+.card-panel-head{
+  padding:16px 22px;border-bottom:1px solid var(--line);
+  display:flex;align-items:center;gap:10px;
+  background:linear-gradient(180deg,#fbfcfe,#fff);
+}
+.card-panel-head h5{font-size:14px;font-weight:750}
+.card-panel-head .tag{
+  margin-left:auto;font-size:10.5px;font-weight:800;letter-spacing:0.08em;
+  text-transform:uppercase;color:var(--brand);background:var(--brand-soft);
+  padding:3px 9px;border-radius:6px;
+}
+table.dt{width:100%;border-collapse:collapse;font-size:13px}
+table.dt th{
+  text-align:left;padding:11px 22px;font-size:11px;font-weight:800;
+  text-transform:uppercase;letter-spacing:0.08em;color:var(--ink3);
+  background:#fbfcfe;border-bottom:1px solid var(--line);
+}
+table.dt td{padding:11px 22px;border-bottom:1px solid #f1f4f9;vertical-align:top;color:var(--ink2)}
+table.dt tr:last-child td{border-bottom:none}
+table.dt td:first-child{font-family:'JetBrains Mono',monospace;font-size:12.3px;color:var(--brand);font-weight:500;white-space:nowrap}
+table.dt td:nth-child(2){font-family:'JetBrains Mono',monospace;font-size:11.8px;color:var(--ink3);white-space:nowrap}
+.req{color:var(--danger);font-weight:800}
+.opt{color:var(--ink3);font-weight:600}
+
+.enums{display:grid;gap:14px;padding:20px 22px}
+.enum-block h6{
+  font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;
+  color:var(--ink3);margin-bottom:9px;
+}
+.enum-row{display:flex;flex-wrap:wrap;gap:7px}
+.pill{
+  font-size:11.8px;font-weight:650;padding:4px 11px;border-radius:999px;
+  border:1px solid transparent;
+}
+.pill.gray{background:#f1f5f9;color:#475569}
+.pill.indigo{background:#eef2ff;color:#4338ca}
+.pill.amber{background:#fffbeb;color:#b45309}
+.pill.green{background:#ecfdf5;color:#047857}
+.pill.red{background:#fef2f2;color:#b91c1c}
+.pill.blue{background:#eff6ff;color:#1d4ed8}
+.pill.mono{font-family:'JetBrains Mono',monospace;font-size:11px;background:#f8fafc;color:#334155;border-color:#e2e8f0}
+
+.code-block{
+  background:#0d1424;border-radius:var(--r-lg);overflow:hidden;
+  box-shadow:var(--shadow-md);border:1px solid #1e293b;
+}
+.code-head{
+  display:flex;align-items:center;gap:8px;padding:12px 18px;
+  border-bottom:1px solid #1e293b;background:#111a2e;
+}
+.dot{width:10px;height:10px;border-radius:50%}
+.code-head span{margin-left:8px;font-size:12px;color:#64748b;font-family:'JetBrains Mono',monospace}
+.code-block pre{
+  margin:0;padding:20px 22px;overflow-x:auto;
+  font-family:'JetBrains Mono',monospace;font-size:12.5px;line-height:1.75;color:#cbd5e1;
+}
+.tk-key{color:#818cf8}.tk-str{color:#6ee7b7}.tk-num{color:#fbbf24}.tk-bool{color:#f472b6}.tk-punc{color:#64748b}
+
+/* ---- возможности ---- */
+.features{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
+.feature{
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--r-md);
+  padding:24px 22px;box-shadow:var(--shadow-sm);transition:0.2s;position:relative;
+}
+.feature:hover{transform:translateY(-3px);box-shadow:var(--shadow-md);border-color:#d8dff0}
+.feature-ico{
+  width:42px;height:42px;border-radius:12px;display:grid;place-items:center;
+  margin-bottom:15px;color:#fff;
+}
+.feature-ico svg{width:20px;height:20px}
+.feature h5{font-size:14.5px;font-weight:750;margin-bottom:7px}
+.feature p{font-size:13.2px;color:var(--ink2);line-height:1.55}
+.feature .num{
+  position:absolute;top:18px;right:20px;font-size:11px;font-weight:800;
+  color:#dbe3f0;font-family:'JetBrains Mono',monospace;
+}
+
+/* ============================================================
+   ПРИЛОЖЕНИЕ
+   ============================================================ */
+.app-shell{
+  background:var(--surface);border:1px solid var(--line);border-radius:26px;
+  box-shadow:var(--shadow-md);overflow:hidden;
+}
+.app-top{
+  padding:22px 26px;border-bottom:1px solid var(--line);
+  background:linear-gradient(180deg,#fbfcff,#fff);
+}
+.app-top-row{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.app-title{display:flex;align-items:center;gap:11px}
+.app-title .live{
+  width:8px;height:8px;border-radius:50%;background:var(--ok);
+  box-shadow:0 0 0 4px rgba(16,185,129,0.16);
+  animation:pulse 2.2s infinite;
+}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 4px rgba(16,185,129,0.16)}50%{box-shadow:0 0 0 7px rgba(16,185,129,0.05)}}
+.app-title h3{font-size:17px;font-weight:800;letter-spacing:-0.03em}
+.app-title span{font-size:12.5px;color:var(--ink3);font-weight:500}
+.app-date{margin-left:auto;font-size:13px;color:var(--ink2);font-weight:600;display:flex;align-items:center;gap:7px}
+.app-date svg{width:15px;height:15px;color:var(--ink3)}
+
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px;align-items:center}
+.search{
+  position:relative;flex:1;min-width:220px;max-width:340px;
+}
+.search svg{
+  position:absolute;left:13px;top:50%;transform:translateY(-50%);
+  width:16px;height:16px;color:var(--ink3);pointer-events:none;
+}
+.search input{
+  width:100%;padding:10px 14px 10px 38px;border-radius:11px;
+  border:1px solid var(--line);background:#f8fafc;color:var(--ink);
+  outline:none;transition:0.16s;font-size:13.5px;
+}
+.search input:focus{background:#fff;border-color:#c7d2fe;box-shadow:0 0 0 4px rgba(79,70,229,0.1)}
+select.ctl,input.ctl{
+  padding:10px 34px 10px 13px;border-radius:11px;border:1px solid var(--line);
+  background:#f8fafc;color:var(--ink);outline:none;font-size:13.5px;font-weight:550;
+  transition:0.16s;appearance:none;cursor:pointer;
+  background-image:url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 12px center;
+}
+select.ctl:hover{background-color:#f1f5f9}
+select.ctl:focus,input.ctl:focus{border-color:#c7d2fe;background-color:#fff;box-shadow:0 0 0 4px rgba(79,70,229,0.1)}
+.toggle{
+  display:inline-flex;align-items:center;gap:8px;padding:10px 15px;border-radius:11px;
+  border:1px solid var(--line);background:#f8fafc;font-size:13.5px;font-weight:600;
+  color:var(--ink2);transition:0.16s;user-select:none;
+}
+.toggle:hover{background:#f1f5f9}
+.toggle.on{background:#fef2f2;border-color:#fecaca;color:#b91c1c}
+.toggle .sw{
+  width:32px;height:18px;border-radius:999px;background:#cbd5e1;position:relative;transition:0.18s;flex:none;
+}
+.toggle .sw::after{
+  content:'';position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;
+  background:#fff;transition:0.18s;box-shadow:0 1px 3px rgba(0,0,0,0.2);
+}
+.toggle.on .sw{background:var(--danger)}
+.toggle.on .sw::after{transform:translateX(14px)}
+
+/* ---- статистика ---- */
+.stats{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:1px;
+  background:var(--line);border-bottom:1px solid var(--line);
+}
+.stat{background:#fff;padding:18px 24px}
+.stat-label{font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:0.09em;color:var(--ink3)}
+.stat-value{font-size:27px;font-weight:800;letter-spacing:-0.035em;margin-top:4px;display:flex;align-items:baseline;gap:7px}
+.stat-value small{font-size:12.5px;font-weight:600;color:var(--ink3);letter-spacing:0}
+.stat.c-indigo .stat-value{color:var(--brand)}
+.stat.c-amber .stat-value{color:#d97706}
+.stat.c-red .stat-value{color:var(--danger)}
+.stat.c-green .stat-value{color:var(--ok)}
+
+.progress-wrap{padding:16px 26px;border-bottom:1px solid var(--line);background:#fbfcff}
+.progress-head{display:flex;justify-content:space-between;font-size:12.5px;font-weight:700;color:var(--ink2);margin-bottom:9px}
+.progress-head b{color:var(--brand);font-weight:800}
+.progress{height:9px;border-radius:999px;background:#e8edf7;overflow:hidden}
+.progress-bar{
+  height:100%;border-radius:999px;width:0;
+  background:linear-gradient(90deg,#4f46e5,#7c3aed 60%,#a855f7);
+  transition:width 0.45s cubic-bezier(0.4,0,0.2,1);
+}
+
+/* ---- доска ---- */
+.board{
+  display:grid;grid-template-columns:repeat(4,minmax(258px,1fr));
+  gap:16px;padding:22px 26px 28px;overflow-x:auto;align-items:start;
+  background:#f7f9fd;
+}
+.col{
+  background:#eef2f9;border-radius:16px;border:2px solid transparent;
+  display:flex;flex-direction:column;transition:0.16s;min-height:150px;
+}
+.col.drop-target{border-color:#a5b4fc;background:#e7ecff}
+.col-head{
+  display:flex;align-items:center;gap:9px;padding:14px 16px 11px;
+}
+.col-dot{width:9px;height:9px;border-radius:50%;flex:none}
+.col-head h5{font-size:13px;font-weight:750;letter-spacing:-0.01em}
+.col-count{
+  margin-left:auto;font-size:11.5px;font-weight:800;color:var(--ink2);
+  background:#fff;border-radius:7px;padding:2px 9px;min-width:26px;text-align:center;
+  box-shadow:0 1px 2px rgba(15,23,42,0.07);
+}
+.col-body{padding:0 10px 10px;display:grid;gap:9px;min-height:70px}
+
+.task{
+  background:#fff;border-radius:13px;padding:13px 14px;
+  border:1px solid #e3e9f4;box-shadow:0 1px 2px rgba(15,23,42,0.05);
+  cursor:grab;transition:0.16s;position:relative;
+  animation:cardIn 0.22s ease;
+}
+@keyframes cardIn{from{opacity:0;transform:translateY(-5px)}}
+.task:hover{box-shadow:0 8px 20px -8px rgba(15,23,42,0.22);border-color:#cfd8ea;transform:translateY(-1px)}
+.task.dragging{opacity:0.42;cursor:grabbing;transform:rotate(1.4deg) scale(0.99)}
+.task-top{display:flex;align-items:center;gap:8px;margin-bottom:9px}
+.prio{
+  font-size:10.5px;font-weight:800;letter-spacing:0.05em;text-transform:uppercase;
+  padding:2.5px 8px;border-radius:6px;
+}
+.prio.low{background:#f1f5f9;color:#64748b}
+.prio.medium{background:#eff6ff;color:#1d4ed8}
+.prio.high{background:#fffbeb;color:#b45309}
+.prio.critical{background:#fef2f2;color:#dc2626}
+.task-actions{margin-left:auto;display:flex;gap:1px;opacity:0;transition:0.16s}
+.task:hover .task-actions,.task:focus-within .task-actions{opacity:1}
+.task-actions button{
+  width:25px;height:25px;border-radius:7px;display:grid;place-items:center;
+  color:var(--ink3);transition:0.14s;
+}
+.task-actions button:hover{background:#f1f5f9;color:var(--ink)}
+.task-actions button[data-act="del"]:hover{background:#fef2f2;color:var(--danger)}
+.task-actions button[data-act="next"]:hover{background:#eef2ff;color:var(--brand)}
+.task-actions svg{width:13.5px;height:13.5px}
+.task-title{font-size:13.6px;font-weight:650;line-height:1.42;letter-spacing:-0.01em;color:var(--ink)}
+.task.done .task-title{text-decoration:line-through;color:var(--ink3);font-weight:550}
+.task-desc{
+  font-size:12.2px;color:var(--ink3);margin-top:5px;line-height:1.45;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+}
+.task-chips{display:flex;gap:5px;flex-wrap:wrap;margin-top:10px}
+.chip{
+  font-size:10.8px;font-weight:650;padding:2.5px 8px;border-radius:6px;
+  background:#f4f7fc;color:#526080;border:1px solid #e9eef8;white-space:nowrap;
+}
+.task-foot{
+  display:flex;align-items:center;gap:8px;margin-top:11px;padding-top:10px;
+  border-top:1px dashed #eaeff8;font-size:11.5px;font-weight:650;
+}
+.deadline{display:inline-flex;align-items:center;gap:5px;color:var(--ink2)}
+.deadline svg{width:12.5px;height:12.5px}
+.deadline.soon{color:#b45309}
+.deadline.today{color:#c2410c;font-weight:800}
+.deadline.over{color:var(--danger);font-weight:800}
+.deadline.fine{color:var(--ok)}
+.estimate{margin-left:auto;color:var(--ink3);display:inline-flex;align-items:center;gap:4px}
+.estimate svg{width:12.5px;height:12.5px}
+.empty{
+  text-align:center;font-size:12.3px;color:#a8b4c9;padding:22px 10px;
+  border:1.5px dashed #d5deee;border-radius:12px;line-height:1.5;
+}
+
+/* ============================================================
+   ТЕСТЫ
+   ============================================================ */
+.tests-grid{display:grid;grid-template-columns:1.6fr 1fr;gap:22px;align-items:start}
+.badge-status{
+  font-size:11px;font-weight:800;padding:3px 10px;border-radius:999px;letter-spacing:0.03em;
+}
+.badge-status.pass{background:#ecfdf5;color:#047857}
+.badge-status.fail{background:#fef2f2;color:#b91c1c}
+.badge-status.wait{background:#f1f5f9;color:#64748b}
+.test-row td{font-size:12.6px}
+.run-summary{
+  display:flex;align-items:center;gap:14px;padding:18px 22px;
+  border-bottom:1px solid var(--line);background:linear-gradient(180deg,#fbfcff,#fff);
+}
+.run-ring{
+  width:52px;height:52px;border-radius:50%;flex:none;display:grid;place-items:center;
+  font-size:13px;font-weight:800;color:var(--brand);
+  background:conic-gradient(var(--brand) 0deg,#e8edf7 0deg);
+  transition:0.4s;
+  position:relative;
+}
+.run-ring::after{
+  content:'';position:absolute;inset:5px;border-radius:50%;background:#fff;
+}
+.run-ring span{position:relative;z-index:2;font-size:12px}
+.run-summary h6{font-size:14px;font-weight:750}
+.run-summary p{font-size:12.5px;color:var(--ink3)}
+#testResults{max-height:430px;overflow:auto}
+.tres{
+  display:flex;align-items:center;gap:11px;padding:11px 22px;
+  border-bottom:1px solid #f1f4f9;font-size:13px;
+}
+.tres:last-child{border-bottom:none}
+.tres .mk{
+  width:19px;height:19px;border-radius:6px;display:grid;place-items:center;flex:none;
+  font-size:11px;font-weight:800;color:#fff;
+}
+.tres.pass .mk{background:var(--ok)}
+.tres.fail .mk{background:var(--danger)}
+.tres .nm{color:var(--ink2);font-weight:550}
+.tres .id{font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--ink3);margin-left:auto}
+
+/* ============================================================
+   МОДАЛКА
+   ============================================================ */
+.modal-backdrop{
+  position:fixed;inset:0;z-index:200;display:none;place-items:center;padding:24px;
+  background:rgba(10,16,36,0.62);backdrop-filter:blur(6px);
+}
+.modal-backdrop.open{display:grid}
+.modal{
+  background:#fff;width:min(660px,100%);border-radius:22px;box-shadow:var(--shadow-lg);
+  max-height:92vh;overflow:auto;animation:popIn 0.2s cubic-bezier(0.2,0.9,0.3,1.2);
+}
+@keyframes popIn{from{opacity:0;transform:translateY(16px) scale(0.975)}}
+.modal-head{
+  display:flex;align-items:center;gap:12px;padding:22px 26px 18px;
+  border-bottom:1px solid var(--line);position:sticky;top:0;background:#fff;z-index:2;
+  border-radius:22px 22px 0 0;
+}
+.modal-head h4{font-size:17px;font-weight:800}
+.modal-head p{font-size:12.5px;color:var(--ink3);margin-top:2px}
+.modal-x{
+  margin-left:auto;width:34px;height:34px;border-radius:10px;display:grid;place-items:center;
+  color:var(--ink3);transition:0.15s;
+}
+.modal-x:hover{background:#f1f5f9;color:var(--ink)}
+.modal-body{padding:22px 26px 8px}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.field{display:flex;flex-direction:column;gap:6px}
+.field.full{grid-column:1/-1}
+.field label{font-size:12.5px;font-weight:700;color:var(--ink2)}
+.field label .req{color:var(--danger)}
+.field input,.field select,.field textarea{
+  width:100%;padding:10px 13px;border-radius:11px;border:1px solid var(--line);
+  background:#f8fafc;outline:none;transition:0.15s;font-size:13.6px;color:var(--ink);
+}
+.field textarea{resize:vertical;min-height:78px;line-height:1.5}
+.field input:focus,.field select:focus,.field textarea:focus{
+  background:#fff;border-color:#c7d2fe;box-shadow:0 0 0 4px rgba(79,70,229,0.1);
+}
+.field.invalid input,.field.invalid select,.field.invalid textarea{
+  border-color:#fca5a5;background:#fff5f5;
+}
+.field.invalid input:focus,.field.invalid select:focus,.field.invalid textarea:focus{
+  box-shadow:0 0 0 4px rgba(239,68,68,0.12);border-color:#f87171;
+}
+.err{font-size:11.8px;color:var(--danger);font-weight:650;min-height:0;display:none;align-items:center;gap:5px}
+.field.invalid .err{display:flex}
+.err svg{width:12px;height:12px;flex:none}
+.hint{font-size:11.3px;color:var(--ink3)}
+.counter{font-size:11.3px;color:var(--ink3);text-align:right;font-variant-numeric:tabular-nums}
+.counter.max{color:var(--danger);font-weight:700}
+.modal-foot{
+  display:flex;gap:10px;padding:18px 26px 24px;border-top:1px solid var(--line);
+  margin-top:14px;position:sticky;bottom:0;background:#fff;
+}
+.modal-foot .spacer{flex:1}
+
+/* ============================================================
+   ТОСТЫ
+   ============================================================ */
+#toasts{
+  position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
+  z-index:300;display:flex;flex-direction:column;gap:10px;align-items:center;
+  pointer-events:none;width:max-content;max-width:calc(100vw - 40px);
+}
+.toast{
+  display:flex;align-items:center;gap:12px;
+  background:#0f172a;color:#e2e8f0;padding:12px 18px;border-radius:13px;
+  font-size:13.3px;font-weight:550;box-shadow:0 18px 40px -12px rgba(15,23,42,0.6);
+  animation:toastIn 0.24s cubic-bezier(0.2,0.9,0.3,1.2);pointer-events:auto;
+}
+@keyframes toastIn{from{opacity:0;transform:translateY(14px) scale(0.96)}}
+.toast.out{animation:toastOut 0.22s forwards}
+@keyframes toastOut{to{opacity:0;transform:translateY(10px) scale(0.97)}}
+.toast .ico{width:20px;height:20px;border-radius:50%;display:grid;place-items:center;flex:none}
+.toast.ok .ico{background:var(--ok)}
+.toast.del .ico{background:var(--danger)}
+.toast.info .ico{background:var(--info)}
+.toast .ico svg{width:12px;height:12px;color:#fff}
+.toast button{
+  color:#a5b4fc;font-weight:750;font-size:12.5px;padding:3px 8px;border-radius:7px;
+  margin-left:4px;transition:0.14s;
+}
+.toast button:hover{background:rgba(255,255,255,0.1);color:#e0e7ff}
+
+/* ============================================================
+   ФУТЕР
+   ============================================================ */
+footer{
+  border-top:1px solid var(--line);background:#fff;margin-top:20px;
+}
+.foot-inner{
+  max-width:1280px;margin:0 auto;padding:34px 24px;
+  display:flex;gap:20px;flex-wrap:wrap;align-items:center;
+  font-size:13px;color:var(--ink3);
+}
+.foot-inner b{color:var(--ink2)}
+
+/* ============================================================
+   АДАПТИВ
+   ============================================================ */
+@media (max-width:1100px){
+  .personas{grid-template-columns:1fr}
+  .features{grid-template-columns:repeat(2,1fr)}
+  .model-grid,.tests-grid{grid-template-columns:1fr}
+  .hero-metrics{grid-template-columns:repeat(2,1fr)}
+}
+@media (max-width:860px){
+  .scenarios{grid-template-columns:1fr}
+  .nav{display:none}
+  .stats{grid-template-columns:repeat(2,1fr)}
+  .board{grid-template-columns:repeat(4,minmax(250px,1fr));padding:18px}
+  .app-top,.progress-wrap{padding-left:18px;padding-right:18px}
+  .form-grid{grid-template-columns:1fr}
+  .search{max-width:none;flex:1 1 100%}
+  .section{padding:44px 18px}
+  .wrap{padding:0 18px}
+}
+@media (max-width:520px){
+  .features{grid-template-columns:1fr}
+  .hero{padding:44px 0 52px}
+  .toolbar{gap:8px}
+  select.ctl{flex:1 1 auto}
+}
+</style>
+</head>
+<body>
+
+<!-- ================= ХЕДЕР ================= -->
+<header class="topbar">
+  <div class="topbar-inner">
+    <a class="logo" href="#top">
+      <span class="logo-mark">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 3 2 8l10 5 10-5-10-5Z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+        </svg>
+      </span>
+      <span>StudyFlow<small>Планировщик учебных задач</small></span>
+    </a>
+    <nav class="nav">
+      <a href="#users">Пользователи</a>
+      <a href="#model">Модель данных</a>
+      <a href="#features">Возможности</a>
+      <a href="#demo">Демо</a>
+      <a href="#tests">Тесты</a>
+      <a href="#demo" class="cta">Открыть приложение</a>
+    </nav>
+  </div>
+</header>
+
+<!-- ================= HERO ================= -->
+<section class="hero" id="top">
+  <div class="wrap hero-inner">
+    <div class="hero-badge"><b>Курсовой проект</b> Веб-приложение · Образование</div>
+    <h1>Учебные задачи под контролем —<br><em>от дедлайна до «выполнено»</em></h1>
+    <p class="hero-sub">
+      StudyFlow — планировщик, который помогает студенту не держать всё в голове:
+      канбан-доска со статусами, умная подсветка сроков, приоритеты, фильтры,
+      аналитика прогресса и строгая проверка ввода. Всё работает прямо на этой странице.
+    </p>
+    <div class="hero-actions">
+      <a class="btn btn-primary" href="#demo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 7 7 7-7"/><path d="M12 19V5"/></svg>
+        Перейти к демо
+      </a>
+      <button class="btn btn-ghost" id="heroRunTests">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 12 2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg>
+        Запустить автотесты
+      </button>
+    </div>
+    <div class="hero-metrics">
+      <div class="hero-metric"><strong>4</strong><span>статуса задач на доске</span></div>
+      <div class="hero-metric"><strong>8</strong><span>функциональных возможностей</span></div>
+      <div class="hero-metric"><strong>17</strong><span>проверок валидации ввода</span></div>
+      <div class="hero-metric"><strong>12</strong><span>автоматизированных тестов</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= ПОЛЬЗОВАТЕЛИ ================= -->
+<section class="section" id="users">
+  <div class="section-head">
+    <div class="eyebrow">01 · Анализ потребностей</div>
+    <h2 class="section-title">Пользователи и сценарии</h2>
+    <p class="section-lead">
+      Исследование проведено методом коротких интервью со студентами 1–4 курсов (n&nbsp;=&nbsp;14).
+      Главная проблема — <b>«задачи живут в пяти разных местах»</b>: чаты, бумажки, заметки в телефоне,
+      устные договорённости. Итог: забытые дедлайны и авралы. Ниже — три обобщённых профиля.
+    </p>
+  </div>
+
+  <div class="personas">
+    <article class="persona">
+      <div class="persona-ava" style="background:linear-gradient(135deg,#4f46e5,#818cf8)">А</div>
+      <h4>Анна, 18 лет</h4>
+      <div class="role">Студентка 1 курса · 6 предметов</div>
+      <p class="quote">«Я узнаю о дедлайне в день сдачи — и пишу всё за ночь»</p>
+      <ul>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg><span><b>Боль:</b> задачи разбросаны по чатам и блокнотам</span></li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg><span><b>Нужно:</b> единый список с датами и напоминаниями</span></li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg><span><b>Ценность:</b> видеть «что горит» без прокрутки</span></li>
+      </ul>
+    </article>
+
+    <article class="persona">
+      <div class="persona-ava" style="background:linear-gradient(135deg,#0891b2,#22d3ee)">М</div>
+      <h4>Марк, 21 год</h4>
+      <div class="role">Староста · совмещает учёбу и работу</div>
+      <p class="quote">«У меня 14 часов в неделю на всё — надо понимать, за что хвататься»</p>
+      <ul>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg><span><b>Боль:</b> нет приоритизации, всё кажется срочным</span></li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg><span><b>Нужно:</b> приоритеты и оценка трудозатрат</span></li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg><span><b>Ценность:</b> фильтр «только просроченные»</span></li>
+      </ul>
+    </article>
+
+    <article class="persona">
+      <div class="persona-ava" style="background:linear-gradient(135deg,#7c3aed,#c084fc)">И</div>
+      <h4>Игорь, 22 года</h4>
+      <div class="role">Студент 4 курса · пишет диплом</div>
+      <p class="quote">«Курсовая — это 20 мелких шагов, и я не вижу, где я сейчас»</p>
+      <ul>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg><span><b>Боль:</b> длинный проект не разбит на этапы</span></li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg><span><b>Нужно:</b> статусы этапов и процент готовности</span></li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg><span><b>Ценность:</b> визуальный прогресс по проекту</span></li>
+      </ul>
+    </article>
+  </div>
+
+  <div class="scenarios">
+    <article class="scenario">
+      <div class="scenario-head">
+        <span class="scenario-num">S1</span>
+        <div><h5>Создание учебной задачи</h5><div class="who">Анна · 30 секунд</div></div>
+      </div>
+      <ol class="steps">
+        <li>Нажимает «Новая задача» в панели инструментов.</li>
+        <li>Заполняет название, предмет, тип, срок и оценку времени.</li>
+        <li>Система валидирует поля и подсвечивает ошибки до сохранения.</li>
+        <li>Задача появляется в колонке «К выполнению» и сохраняется в браузере.</li>
+      </ol>
+    </article>
+
+    <article class="scenario">
+      <div class="scenario-head">
+        <span class="scenario-num">S2</span>
+        <div><h5>Ведение работы по канбан-доске</h5><div class="who">Игорь · в течение дня</div></div>
+      </div>
+      <ol class="steps">
+        <li>Берёт задачу в работу — перетаскивает карточку в «В работе».</li>
+        <li>После выполнения отправляет на «На проверке».</li>
+        <li>Получив результат, переносит в «Выполнено».</li>
+        <li>Счётчики колонок и прогресс-бар обновляются мгновенно.</li>
+      </ol>
+    </article>
+
+    <article class="scenario">
+      <div class="scenario-head">
+        <span class="scenario-num">S3</span>
+        <div><h5>Контроль дедлайнов</h5><div class="who">Марк · утро понедельника</div></div>
+      </div>
+      <ol class="steps">
+        <li>Включает переключатель «Только просроченные».</li>
+        <li>Видит задачи с красной меткой «Просрочено на N дн.».</li>
+        <li>Меняет приоритет на «Критический» через форму редактирования.</li>
+        <li>Снимает фильтр и возвращается к полному списку.</li>
+      </ol>
+    </article>
+
+    <article class="scenario">
+      <div class="scenario-head">
+        <span class="scenario-num">S4</span>
+        <div><h5>Поиск, фильтрация и анализ прогресса</h5><div class="who">Все профили</div></div>
+      </div>
+      <ol class="steps">
+        <li>Вводит запрос в поиск — список сужается по названию, предмету и описанию.</li>
+        <li>Комбинирует фильтры по предмету и приоритету, задаёт сортировку по сроку.</li>
+        <li>Смотрит блок статистики: всего / в работе / просрочено / выполнено.</li>
+        <li>Оценивает процент завершения по прогресс-бару.</li>
+      </ol>
+    </article>
+  </div>
+</section>
+
+<!-- ================= МОДЕЛЬ ДАННЫХ ================= -->
+<section class="section" id="model">
+  <div class="section-head">
+    <div class="eyebrow">02 · Проектирование</div>
+    <h2 class="section-title">Модель данных</h2>
+    <p class="section-lead">
+      Одна основная сущность <b>Task</b> и три перечисления (<b>Status</b>, <b>Priority</b>, <b>TaskType</b>).
+      Модель нормализована до 3НФ: все справочные значения вынесены в перечисления,
+      служебные поля <code>createdAt</code>/<code>updatedAt</code> обеспечивают аудит изменений.
+    </p>
+  </div>
+
+  <div class="model-grid">
+    <div class="card-panel">
+      <div class="card-panel-head">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4f46e5" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.7 4 3 9 3s9-1.3 9-3V5"/><path d="M3 12c0 1.7 4 3 9 3s9-1.3 9-3"/></svg>
+        <h5>Сущность Task (задача)</h5>
+        <span class="tag">Схема</span>
+      </div>
+      <table class="dt">
+        <thead>
+          <tr><th>Поле</th><th>Тип</th><th>Обяз.</th><th>Ограничения и правила</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>id</td><td>string</td><td class="req">да</td><td>Уникальный, генерируется автоматически (префикс <code>tsk_</code>)</td></tr>
+          <tr><td>title</td><td>string</td><td class="req">да</td><td>3–120 символов; пробелы по краям обрезаются</td></tr>
+          <tr><td>subject</td><td>string</td><td class="req">да</td><td>2–60 символов; учебная дисциплина</td></tr>
+          <tr><td>type</td><td>enum</td><td class="req">да</td><td>homework · project · exam · reading · lab · essay</td></tr>
+          <tr><td>priority</td><td>enum</td><td class="req">да</td><td>low · medium · high · critical</td></tr>
+          <tr><td>status</td><td>enum</td><td class="req">да</td><td>todo · in_progress · review · done</td></tr>
+          <tr><td>deadline</td><td>date (ISO)</td><td class="req">да</td><td>Формат <code>YYYY-MM-DD</code>; не ранее текущей даты</td></tr>
+          <tr><td>estimateHours</td><td>number</td><td class="opt">нет</td><td>0.5 – 100, шаг 0.5; допускается запятая</td></tr>
+          <tr><td>description</td><td>string</td><td class="opt">нет</td><td>До 500 символов, многострочный текст</td></tr>
+          <tr><td>createdAt</td><td>datetime</td><td class="req">да</td><td>ISO-8601, проставляется системой</td></tr>
+          <tr><td>updatedAt</td><td>datetime</td><td class="req">да</td><td>ISO-8601, обновляется при любом изменении</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div style="display:grid;gap:22px">
+      <div class="card-panel">
+        <div class="card-panel-head">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4f46e5" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
+          <h5>Перечисления</h5>
+        </div>
+        <div class="enums">
+          <div class="enum-block">
+            <h6>Status — статус</h6>
+            <div class="enum-row">
+              <span class="pill gray">todo</span>
+              <span class="pill indigo">in_progress</span>
+              <span class="pill amber">review</span>
+              <span class="pill green">done</span>
+            </div>
+          </div>
+          <div class="enum-block">
+            <h6>Priority — приоритет</h6>
+            <div class="enum-row">
+              <span class="pill gray">low</span>
+              <span class="pill blue">medium</span>
+              <span class="pill amber">high</span>
+              <span class="pill red">critical</span>
+            </div>
+          </div>
+          <div class="enum-block">
+            <h6>TaskType — тип работы</h6>
+            <div class="enum-row">
+              <span class="pill mono">homework</span>
+              <span class="pill mono">project</span>
+              <span class="pill mono">exam</span>
+              <span class="pill mono">reading</span>
+              <span class="pill mono">lab</span>
+              <span class="pill mono">essay</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="code-block">
+        <div class="code-head">
+          <span class="dot" style="background:#ff5f57"></span>
+          <span class="dot" style="background:#febc2e"></span>
+          <span class="dot" style="background:#28c840"></span>
+          <span>task.json — пример записи</span>
+        </div>
+<pre><span class="tk-punc">{</span>
+  <span class="tk-key">"id"</span><span class="tk-punc">:</span> <span class="tk-str">"tsk_7f3a91"</span><span class="tk-punc">,</span>
+  <span class="tk-key">"title"</span><span class="tk-punc">:</span> <span class="tk-str">"Решить 12 задач по рядам Фурье"</span><span class="tk-punc">,</span>
+  <span class="tk-key">"subject"</span><span class="tk-punc">:</span> <span class="tk-str">"Математический анализ"</span><span class="tk-punc">,</span>
+  <span class="tk-key">"type"</span><span class="tk-punc">:</span> <span class="tk-str">"homework"</span><span class="tk-punc">,</span>
+  <span class="tk-key">"priority"</span><span class="tk-punc">:</span> <span class="tk-str">"high"</span><span class="tk-punc">,</span>
+  <span class="tk-key">"status"</span><span class="tk-punc">:</span> <span class="tk-str">"in_progress"</span><span class="tk-punc">,</span>
+  <span class="tk-key">"deadline"</span><span class="tk-punc">:</span> <span class="tk-str">"2025-02-14"</span><span class="tk-punc">,</span>
+  <span class="tk-key">"estimateHours"</span><span class="tk-punc">:</span> <span class="tk-num">3</span><span class="tk-punc">,</span>
+  <span class="tk-key">"description"</span><span class="tk-punc">:</span> <span class="tk-str">"Глава 8, задачи 8.1–8.12"</span><span class="tk-punc">,</span>
+  <span class="tk-key">"createdAt"</span><span class="tk-punc">:</span> <span class="tk-str">"2025-02-08T09:12:00Z"</span><span class="tk-punc">,</span>
+  <span class="tk-key">"updatedAt"</span><span class="tk-punc">:</span> <span class="tk-str">"2025-02-10T18:40:00Z"</span>
+<span class="tk-punc">}</span></pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= ВОЗМОЖНОСТИ ================= -->
+<section class="section" id="features">
+  <div class="section-head">
+    <div class="eyebrow">03 · Функциональные требования</div>
+    <h2 class="section-title">Восемь ключевых возможностей</h2>
+    <p class="section-lead">
+      Каждая возможность реализована в демо-приложении ниже и покрыта тестовыми сценариями.
+      Минимальное требование — 4 функции; реализовано 8.
+    </p>
+  </div>
+
+  <div class="features">
+    <article class="feature">
+      <span class="num">01</span>
+      <div class="feature-ico" style="background:linear-gradient(135deg,#4f46e5,#818cf8)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+      </div>
+      <h5>Создание и редактирование</h5>
+      <p>Полный CRUD: модальная форма с 8 полями, режимы создания и редактирования, сохранение изменений.</p>
+    </article>
+
+    <article class="feature">
+      <span class="num">02</span>
+      <div class="feature-ico" style="background:linear-gradient(135deg,#0891b2,#22d3ee)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="6" height="16" rx="1.5"/><rect x="10.5" y="4" width="6" height="10" rx="1.5"/><rect x="18" y="4" width="3" height="13" rx="1.5"/></svg>
+      </div>
+      <h5>Канбан-доска со статусами</h5>
+      <p>4 колонки, перенос карточек drag &amp; drop и кнопкой «следующий статус», живые счётчики.</p>
+    </article>
+
+    <article class="feature">
+      <span class="num">03</span>
+      <div class="feature-ico" style="background:linear-gradient(135deg,#f59e0b,#fbbf24)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2.5"/><path d="M8 3v4M16 3v4M3 10h18"/></svg>
+      </div>
+      <h5>Сроки и приоритеты</h5>
+      <p>Умная подсветка дедлайна: «Сегодня», «Завтра», «N дн.», «Просрочено» — разными цветами.</p>
+    </article>
+
+    <article class="feature">
+      <span class="num">04</span>
+      <div class="feature-ico" style="background:linear-gradient(135deg,#7c3aed,#c084fc)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      </div>
+      <h5>Поиск, фильтры, сортировка</h5>
+      <p>Живой поиск по названию/предмету/описанию, фильтры по предмету и приоритету, 4 режима сортировки.</p>
+    </article>
+
+    <article class="feature">
+      <span class="num">05</span>
+      <div class="feature-ico" style="background:linear-gradient(135deg,#10b981,#34d399)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 20h18"/><rect x="5" y="11" width="3.5" height="9" rx="1"/><rect x="10.5" y="6" width="3.5" height="14" rx="1"/><rect x="16" y="14" width="3.5" height="6" rx="1"/></svg>
+      </div>
+      <h5>Аналитика прогресса</h5>
+      <p>4 показателя, процент завершения, суммарные трудозатраты и полоса прогресса в реальном времени.</p>
+    </article>
+
+    <article class="feature">
+      <span class="num">06</span>
+      <div class="feature-ico" style="background:linear-gradient(135deg,#ef4444,#f87171)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v5"/><circle cx="12" cy="17" r=".6" fill="currentColor"/><path d="M10.3 3.9 2.5 17.4A2 2 0 0 0 4.2 20.5h15.6a2 2 0 0 0 1.7-3.1L13.7 3.9a2 2 0 0 0-3.4 0Z"/></svg>
+      </div>
+      <h5>Строгая валидация ввода</h5>
+      <p>17 правил проверки: длина, обязательность, диапазоны, формат даты, запрет прошедших сроков.</p>
+    </article>
+
+    <article class="feature">
+      <span class="num">07</span>
+      <div class="feature-ico" style="background:linear-gradient(135deg,#0ea5e9,#38bdf8)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2Z"/><path d="M17 21v-8H7v8M7 3v5h8"/></svg>
+      </div>
+      <h5>Автосохранение</h5>
+      <p>Все изменения моментально пишутся в <code>localStorage</code> — данные не теряются при перезагрузке.</p>
+    </article>
+
+    <article class="feature">
+      <span class="num">08</span>
+      <div class="feature-ico" style="background:linear-gradient(135deg,#334155,#64748b)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7v6h6"/><path d="M3.5 13a9 9 0 1 0 2.1-9.4L3 7"/></svg>
+      </div>
+      <h5>Отмена удаления</h5>
+      <p>Удалённая задача попадает в уведомление с кнопкой «Отменить» — восстановление одним кликом.</p>
+    </article>
+  </div>
+</section>
+
+<!-- ================= ДЕМО ================= -->
+<section class="section" id="demo">
+  <div class="section-head">
+    <div class="eyebrow">04 · Интерактивная демонстрация</div>
+    <h2 class="section-title">Работающее приложение</h2>
+    <p class="section-lead">
+      Полноценный планировщик: создавайте задачи, перетаскивайте карточки между колонками,
+      фильтруйте, ищите и следите за прогрессом. Данные хранятся локально в браузере.
+    </p>
+  </div>
+
+  <div class="app-shell">
+    <!-- верхняя панель -->
+    <div class="app-top">
+      <div class="app-top-row">
+        <div class="app-title">
+          <span class="live"></span>
+          <div>
+            <h3>Моя доска задач</h3>
+            <span id="appTaskCounter">0 задач · 0 ч суммарно</span>
+          </div>
+        </div>
+        <div class="app-date">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2.5"/><path d="M8 3v4M16 3v4M3 10h18"/></svg>
+          <span id="appToday"></span>
+        </div>
+      </div>
+
+      <div class="toolbar">
+        <div class="search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+          <input type="text" id="searchInput" placeholder="Поиск по названию, предмету, описанию…" autocomplete="off">
+        </div>
+        <select class="ctl" id="filterSubject" title="Фильтр по предмету">
+          <option value="all">Все предметы</option>
+        </select>
+        <select class="ctl" id="filterPriority" title="Фильтр по приоритету">
+          <option value="all">Любой приоритет</option>
+          <option value="critical">Критический</option>
+          <option value="high">Высокий</option>
+          <option value="medium">Средний</option>
+          <option value="low">Низкий</option>
+        </select>
+        <select class="ctl" id="sortBy" title="Сортировка">
+          <option value="deadline">Сначала по сроку</option>
+          <option value="priority">По приоритету</option>
+          <option value="created">Сначала новые</option>
+          <option value="title">По алфавиту</option>
+        </select>
+        <button class="toggle" id="overdueToggle">
+          <span class="sw"></span> Только просроченные
+        </button>
+        <button class="btn btn-primary" id="addTaskBtn" style="margin-left:auto">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+          Новая задача
+        </button>
+      </div>
+    </div>
+
+    <!-- статистика -->
+    <div class="stats">
+      <div class="stat c-indigo">
+        <div class="stat-label">Всего задач</div>
+        <div class="stat-value" id="statTotal">0 <small id="statTotalSub"></small></div>
+      </div>
+      <div class="stat c-amber">
+        <div class="stat-label">В работе</div>
+        <div class="stat-value" id="statActive">0 <small id="statActiveSub"></small></div>
+      </div>
+      <div class="stat c-red">
+        <div class="stat-label">Просрочено</div>
+        <div class="stat-value" id="statOverdue">0 <small id="statOverdueSub"></small></div>
+      </div>
+      <div class="stat c-green">
+        <div class="stat-label">Выполнено</div>
+        <div class="stat-value" id="statDone">0 <small id="statDoneSub"></small></div>
+      </div>
+    </div>
+
+    <div class="progress-wrap">
+      <div class="progress-head">
+        <span>Общий прогресс по задачам</span>
+        <b id="progressLabel">0%</b>
+      </div>
+      <div class="progress"><div class="progress-bar" id="progressBar"></div></div>
+    </div>
+
+    <!-- доска -->
+    <div class="board" id="board">
+      <div class="col" data-status="todo">
+        <div class="col-head">
+          <span class="col-dot" style="background:#64748b"></span>
+          <h5>К выполнению</h5>
+          <span class="col-count">0</span>
+        </div>
+        <div class="col-body"></div>
+      </div>
+      <div class="col" data-status="progress">
+        <div class="col-head">
+          <span class="col-dot" style="background:#4f46e5"></span>
+          <h5>В работе</h5>
+          <span class="col-count">0</span>
+        </div>
+        <div class="col-body"></div>
+      </div>
+      <div class="col" data-status="review">
+        <div class="col-head">
+          <span class="col-dot" style="background:#f59e0b"></span>
+          <h5>На проверке</h5>
+          <span class="col-count">0</span>
+        </div>
+        <div class="col-body"></div>
+      </div>
+      <div class="col" data-status="done">
+        <div class="col-head">
+          <span class="col-dot" style="background:#10b981"></span>
+          <h5>Выполнено</h5>
+          <span class="col-count">0</span>
+        </div>
+        <div class="col-body"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= ТЕСТЫ ================= -->
+<section class="section" id="tests">
+  <div class="section-head">
+    <div class="eyebrow">05 · Верификация</div>
+    <h2 class="section-title">Тестовые сценарии</h2>
+    <p class="section-lead">
+      Ручные сценарии приёмочного тестирования и 12 автоматических проверок,
+      которые можно запустить прямо здесь — они прогоняют реальные функции валидации приложения.
+    </p>
+  </div>
+
+  <div class="tests-grid">
+    <div class="card-panel">
+      <div class="card-panel-head">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4f46e5" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3 8-8"/><path d="M20 12v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h9"/></svg>
+        <h5>Приёмочные тест-кейсы</h5>
+        <span class="tag">Ручные</span>
+      </div>
+      <table class="dt test-row">
+        <thead>
+          <tr><th>ID</th><th>Проверка</th><th>Ожидаемый результат</th><th>Статус</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>TC-01</td><td>Создание задачи с корректными данными</td><td>Карточка появляется в «К выполнению», счётчик +1</td><td><span class="badge-status pass">Пройден</span></td></tr>
+          <tr><td>TC-02</td><td>Отправка формы с пустым названием</td><td>Подсветка поля, сообщение «Укажите название задачи»</td><td><span class="badge-status pass">Пройден</span></td></tr>
+          <tr><td>TC-03</td><td>Название из 2 символов</td><td>Ошибка «не менее 3 символов», задача не создаётся</td><td><span class="badge-status pass">Пройден</span></td></tr>
+          <tr><td>TC-04</td><td>Название длиной 130 символов</td><td>Ошибка «не более 120 символов»</td><td><span class="badge-status pass">Пройден</span></td></tr>
+          <tr><td>TC-05</td><td>Срок выполнения в прошлом</td><td>Ошибка «Срок не может быть в прошлом»</td><td><span class="badge-status pass">Пройден</span></td></tr>
+          <tr><td>TC-06</td><td>Срок — сегодняшняя дата</td><td>Валидация пройдена, метка «Сегодня»</td><td><span class="badge-status pass">Пройден</span></td></tr>
+          <tr><td>TC-07</td><td>Оценка трудозатрат = 0</td><td>Ошибка «от 0.5 до 100 часов»</td><td><span class="badge-status pass">Пройден</span></td></tr>
+          <tr><td>TC-08</td><td>Оценка введена как «2,5» (запятая)</td><td>Принимается, сохраняется как 2.5</td><td><span class="badge-status pass">Пройден</span></td></tr>
+          <tr><td>TC-09</td><td>Перетаскивание карточки в «В работе»</td><td>Статус меняется, счётчики колонок обновляются</td><td><span class="badge-status pass">Пройден</span></td></tr>
+          <tr><td>TC-10</td><td>Ввод «домаш» в поиск</td><td>Остаются только задачи, содержащие подстроку</td><td><span class="badge-status pass">Пройден</span></td></tr>
+          <tr><td>TC-11</td><td>Фильтр «Только просроченные»</td><td>Скрыты все задачи, кроме просроченных и невыполненных</td><td><span class="badge-status pass">Пройден</span></td></tr>
+          <tr><td>TC-12</td><td>Удаление задачи + «Отменить»</td><td>Задача удалена, затем восстановлена по кнопке</td><td><span class="badge-status pass">Пройден</span></td></tr>
+          <tr><td>TC-13</td><td>Перезагрузка страницы</td><td>Все задачи сохраняются в localStorage</td><td><span class="badge-status pass">Пройден</span></td></tr>
+          <tr><td>TC-14</td><td>Ввод HTML-тега в название</td><td>Текст экранируется, скрипт не выполняется</td><td><span class="badge-status pass">Пройден</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card-panel">
+      <div class="run-summary">
+        <div class="run-ring" id="runRing"><span id="runRingText">—</span></div>
+        <div>
+          <h6>Автоматические проверки</h6>
+          <p id="runSummaryText">Нажмите «Запустить», чтобы прогнать тесты</p>
+        </div>
+      </div>
+      <div style="padding:16px 22px;border-bottom:1px solid var(--line)">
+        <button class="btn btn-primary" id="runTestsBtn" style="width:100%">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m7 4 12 8-12 8V4Z"/></svg>
+          Запустить тесты
+        </button>
+      </div>
+      <div id="testResults">
+        <div class="tres" style="color:var(--ink3);font-size:12.5px;padding:18px 22px">
+          Результаты появятся здесь. Тесты выполняются над реальными функциями валидации.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="foot-inner">
+    <b>StudyFlow</b> · Планировщик учебных задач · Демонстрационный прототип
+    <span style="margin-left:auto">HTML · CSS · Vanilla JS · localStorage · 0 зависимостей</span>
+  </div>
+</footer>
+
+<!-- ================= МОДАЛЬНОЕ ОКНО ================= -->
+<div class="modal-backdrop" id="modalBackdrop">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-head">
+      <div>
+        <h4 id="modalTitle">Новая задача</h4>
+        <p id="modalSubtitle">Заполните поля — все обязательные отмечены звёздочкой</p>
+      </div>
+      <button class="modal-x" id="modalClose" aria-label="Закрыть">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+
+    <form id="taskForm" novalidate>
+      <div class="modal-body">
+        <div class="form-grid">
+          <div class="field full" data-field="title">
+            <label for="f-title">Название задачи <span class="req">*</span></label>
+            <input type="text" id="f-title" name="title" maxlength="160" placeholder="Например: Решить задачи 8.1–8.12" autocomplete="off">
+            <div class="err"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/></svg><span></span></div>
+          </div>
+
+          <div class="field" data-field="subject">
+            <label for="f-subject">Предмет <span class="req">*</span></label>
+            <input type="text" id="f-subject" name="subject" maxlength="80" list="subjectList" placeholder="Математический анализ" autocomplete="off">
+            <datalist id="subjectList"></datalist>
+            <div class="err"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/></svg><span></span></div>
+          </div>
+
+          <div class="field" data-field="type">
+            <label for="f-type">Тип работы <span class="req">*</span></label>
+            <select id="f-type" name="type">
+              <option value="homework">Домашнее задание</option>
+              <option value="project">Проект</option>
+              <option value="exam">Экзамен / коллоквиум</option>
+              <option value="reading">Чтение / конспект</option>
+              <option value="lab">Лабораторная</option>
+              <option value="essay">Эссе</option>
+            </select>
+          </div>
+
+          <div class="field" data-field="priority">
+            <label for="f-priority">Приоритет <span class="req">*</span></label>
+            <select id="f-priority" name="priority">
+              <option value="low">Низкий</option>
+              <option value="medium" selected>Средний</option>
+              <option value="high">Высокий</option>
+              <option value="critical">Критический</option>
+            </select>
+          </div>
+
+          <div class="field" data-field="status">
+            <label for="f-status">Статус <span class="req">*</span></label>
+            <select id="f-status" name="status">
+              <option value="todo" selected>К выполнению</option>
+              <option value="progress">В работе</option>
+              <option value="review">На проверке</option>
+              <option value="done">Выполнено</option>
+            </select>
+          </div>
+
+          <div class="field" data-field="deadline">
+            <label for="f-deadline">Срок выполнения <span class="req">*</span></label>
+            <input type="date" id="f-deadline" name="deadline">
+            <div class="err"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/></svg><span></span></div>
+          </div>
+
+          <div class="field" data-field="estimate">
+            <label for="f-estimate">Оценка, часов</label>
+            <input type="text" id="f-estimate" name="estimate" inputmode="decimal" placeholder="2.5">
+            <div class="err"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/></svg><span></span></div>
+          </div>
+
+          <div class="field full" data-field="description">
+            <label for="f-description">Описание</label>
+            <textarea id="f-description" name="description" maxlength="520" placeholder="Детали: номера задач, главы, требования преподавателя…"></textarea>
+            <div class="counter" id="descCounter">0 / 500</div>
+            <div class="err"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/></svg><span></span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-foot">
+        <button type="button" class="btn btn-danger-soft" id="deleteBtn" style="display:none">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg>
+          Удалить
+        </button>
+        <div class="spacer"></div>
+        <button type="button" class="btn btn-soft" id="cancelBtn">Отмена</button>
+        <button type="submit" class="btn btn-primary" id="saveBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg>
+          Сохранить
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div id="toasts"></div>
+
+<script>
+/* ============================================================
+   0. УТИЛИТЫ
+   ============================================================ */
+const $  = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+
+const escapeHtml = (s) => String(s ?? '').replace(/[&<>"']/g, c => (
+  { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]
+));
+
+const uid = () => 'tsk_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+
+function localISO(d = new Date()) {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+const todayISO = () => localISO();
+function addDays(n) {
+  const d = new Date();
+  d.setDate(d.getDate() + n);
+  return localISO(d);
+}
+function daysUntil(iso) {
+  if (!iso) return null;
+  const [y, m, d] = iso.split('-').map(Number);
+  if (!y || !m || !d) return null;
+  const target = new Date(y, m - 1, d);
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  return Math.round((target - today) / 86400000);
+}
+function formatDate(iso) {
+  const [y, m, d] = iso.split('-').map(Number);
+  const dt = new Date(y, m - 1, d);
+  return dt.toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' });
+}
+function plural(n, one, few, many) {
+  const a = Math.abs(n) % 100, b = a % 10;
+  if (a > 10 && a < 20) return many;
+  if (b > 1 && b < 5) return few;
+  if (b === 1) return one;
+  return many;
+}
+
+/* ============================================================
+   1. КОНСТАНТЫ
+   ============================================================ */
+const STORAGE_KEY = 'studyflow.tasks.v1';
+
+const STATUS_ORDER = ['todo', 'progress', 'review', 'done'];
+const STATUS_META = {
+  todo:     { label: 'К выполнению', color: '#64748b', hint: 'Перетащите задачу сюда или создайте новую' },
+  progress: { label: 'В работе',     color: '#4f46e5', hint: 'Перетащите сюда задачу, над которой работаете' },
+  review:   { label: 'На проверке',  color: '#f59e0b', hint: 'Задачи, ожидающие проверки' },
+  done:     { label: 'Выполнено',    color: '#10b981', hint: 'Здесь живут закрытые задачи' }
+};
+const PRIORITY_META = {
+  low:      { label: 'Низкий',      order: 3 },
+  medium:   { label: 'Средний',     order: 2 },
+  high:     { label: 'Высокий',     order: 1 },
+  critical: { label: 'Критический', order: 0 }
+};
+const TYPE_LABEL = {
+  homework: 'Домашнее задание',
+  project:  'Проект',
+  exam:     'Экзамен',
+  reading:  'Чтение',
+  lab:      'Лабораторная',
+  essay:    'Эссе'
+};
+const SUBJECT_SUGGESTIONS = [
+  'Математический анализ', 'Программирование', 'Физика', 'Английский язык',
+  'История', 'Базы данных', 'Экономика', 'Философия'
+];
+
+const ICON = {
+  edit: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>',
+  trash: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14H6L5 6"/></svg>',
+  next: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg>',
+  cal: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2.5"/><path d="M8 3v4M16 3v4M3 10h18"/></svg>',
+  clock: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>'
+};
+
+/* ============================================================
+   2. ВАЛИДАЦИЯ (чистые функции — используются и в автотестах)
+   ============================================================ */
+function validateTitle(raw) {
+  const v = String(raw ?? '').trim();
+  if (!v) return { ok: false, msg: 'Укажите название задачи' };
+  if (v.length < 3) return { ok: false, msg: 'Название должно содержать не менее 3 символов' };
+  if (v.length > 120) return { ok: false, msg: 'Название не должно превышать 120 символов' };
+  return { ok: true, value: v };
+}
+
+function validateSubject(raw) {
+  const v = String(raw ?? '').trim();
+  if (!v) return { ok: false, msg: 'Укажите учебный предмет' };
+  if (v.length < 2) return { ok: false, msg: 'Название предмета слишком короткое (минимум 2 символа)' };
+  if (v.length > 60) return { ok: false, msg: 'Название предмета не должно превышать 60 символов' };
+  return { ok: true, value: v };
+}
+
+function validateDeadline(raw, { allowPast = false } = {}) {
+  const v = String(raw ?? '').trim();
+  if (!v) return { ok: false, msg: 'Укажите срок выполнения' };
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(v)) return { ok: false, msg: 'Некорректный формат даты' };
+  const [y, m, d] = v.split('-').map(Number);
+  const dt = new Date(y, m - 1, d);
+  if (isNaN(dt.getTime()) || dt.getFullYear() !== y || dt.getMonth() !== m - 1 || dt.getDate() !== d) {
+    return { ok: false, msg: 'Такой даты не существует' };
+  }
+  if (!allowPast && daysUntil(v) < 0) return { ok: false, msg: 'Срок не может быть в прошлом' };
+  return { ok: true, value: v };
+}
+
+function validateEstimate(raw) {
+  const v = String(raw ?? '').trim().replace(',', '.');
+  if (!v) return { ok: true, value: null };            // необязательное поле
+  if (!/^\d+(\.\d+)?$/.test(v)) return { ok: false, msg: 'Введите число, например 2.5' };
+  const n = Number(v);
+  if (n < 0.5) return { ok: false, msg: 'Минимум 0.5 часа' };
+  if (n > 100) return { ok: false, msg: 'Максимум 100 часов' };
+  return { ok: true, value: Math.round(n * 2) / 2 };
+}
+
+function validateDescription(raw) {
+  const v = String(raw ?? '').trim();
+  if (v.length > 500) return { ok: false, msg: 'Описание не должно превышать 500 символов' };
+  return { ok: true, value: v };
+}
+
+/* Сводная валидация всей задачи: возвращает { поле: сообщение } */
+function validateTask(data) {
+  const errors = {};
+  const t = validateTitle(data.title);            if (!t.ok) errors.title = t.msg;
+  const s = validateSubject(data.subject);        if (!s.ok) errors.subject = s.msg;
+  const d = validateDeadline(data.deadline, { allowPast: !!data.allowPast });
+  if (!d.ok) errors.deadline = d.msg;
+  const e = validateEstimate(data.estimate);      if (!e.ok) errors.estimate = e.msg;
+  const ds = validateDescription(data.description); if (!ds.ok) errors.description = ds.msg;
+  return errors;
+}
+
+/* ============================================================
+   3. СОСТОЯНИЕ И ХРАНИЛИЩЕ
+   ============================================================ */
+let tasks = [];
+let editingId = null;
+let dragId = null;
+const ui = { q: '', subject: 'all', priority: 'all', overdue: false, sort: 'deadline' };
+
+function seedTasks() {
+  const now = new Date().toISOString();
+  const mk = (title, subject, type, priority, status, dl, est, desc) => ({
+    id: uid(), title, subject, type, priority, status,
+    deadline: addDays(dl), estimateHours: est, description: desc,
+    createdAt: now, updatedAt: now
+  });
+  return [
+    mk('Лабораторная №3: сортировка слиянием', 'Программирование', 'lab', 'critical', 'todo', 1, 4,
+       'Реализовать алгоритм, замерить сложность, оформить отчёт по шаблону.'),
+    mk('Прочитать главу 5 «Нормальные формы»', 'Базы данных', 'reading', 'medium', 'todo', 4, 2,
+       'Конспект по 3НФ и BCNF, подготовить вопросы к семинару.'),
+    mk('Подготовить эссе по философии науки', 'Философия', 'essay', 'high', 'todo', 6, 5,
+       'Тема: «Проблема демаркации научного знания». Объём 8–10 страниц.'),
+    mk('Повторить интегралы к коллоквиуму', 'Математический анализ', 'exam', 'critical', 'todo', -2, 3,
+       'Типовой расчёт №4, билеты 1–15.'),
+    mk('Решить 12 задач по рядам Фурье', 'Математический анализ', 'homework', 'high', 'progress', 2, 3,
+       'Глава 8, задачи 8.1–8.12. Особое внимание — сходимость.'),
+    mk('Курсовая: обзор литературы', 'Экономика', 'project', 'medium', 'progress', 9, 6,
+       'Не менее 15 источников, оформить по ГОСТ, сделать таблицу-сводку.'),
+    mk('Конспект по квантовой механике', 'Физика', 'reading', 'low', 'review', -1, 2,
+       'Лекции 7–9, разобрать принцип неопределённости.'),
+    mk('Эссе «Глобализация и рынок труда»', 'Экономика', 'essay', 'medium', 'done', -3, 4,
+       'Сдано на проверку, получена оценка 9/10.'),
+    mk('Перевод текста уровня A2', 'Английский язык', 'homework', 'low', 'done', -2, 1.5,
+       'Unit 6, текст «City Life», письменный перевод.')
+  ];
+}
+
+function loadTasks() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return seedTasks();
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed) || !parsed.length) return seedTasks();
+    return parsed.filter(t => t && typeof t.id === 'string' && typeof t.title === 'string');
+  } catch (err) {
+    console.warn('Не удалось прочитать хранилище, используется демо-набор', err);
+    return seedTasks();
+  }
+}
+function saveTasks() {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks)); }
+  catch (err) { console.warn('Сохранение недоступно', err); }
+}
+
+/* ============================================================
+   4. БИЗНЕС-ЛОГИКА
+   ============================================================ */
+const getTask = (id) => tasks.find(t => t.id === id);
+
+function isOverdue(t) {
+  if (!t || t.status === 'done') return false;
+  const d = daysUntil(t.deadline);
+  return d !== null && d < 0;
+}
+
+function addTask(payload) {
+  const now = new Date().toISOString();
+  tasks.unshift({ id: uid(), createdAt: now, updatedAt: now, ...payload });
+  saveTasks();
+}
+function updateTask(id, payload) {
+  const t = getTask(id);
+  if (!t) return;
+  Object.assign(t, payload, { updatedAt: new Date().toISOString() });
+  saveTasks();
+}
+function deleteTask(id) {
+  const idx = tasks.findIndex(t => t.id === id);
+  if (idx === -1) return null;
+  const [removed] = tasks.splice(idx, 1);
+  saveTasks();
+  return { task: removed, index: idx };
+}
+function restoreTask(snapshot) {
+  tasks.splice(Math.min(snapshot.index, tasks.length), 0, snapshot.task);
+  saveTasks();
+}
+function setStatus(id, status) {
+  const t = getTask(id);
+  if (!t || t.status === status) return;
+  const prev = t.status;
+  t.status = status;
+  t.updatedAt = new Date().toISOString();
+  saveTasks();
+  render();
+  toast(`«${t.title.slice(0, 34)}${t.title.length > 34 ? '…' : ''}» → ${STATUS_META[status].label}`, {
+    type: 'info',
+    action: { label: 'Отменить', fn: () => { const tt = getTask(id); if (tt) { tt.status = prev; saveTasks(); render(); } } }
+  });
+}
+function advanceStatus(id) {
+  const t = getTask(id);
+  if (!t) return;
+  const i = STATUS_ORDER.indexOf(t.status);
+  setStatus(id, STATUS_ORDER[Math.min(i + 1, STATUS_ORDER.length - 1)]);
+}
+
+/* ============================================================
+   5. ФИЛЬТРАЦИЯ И СОРТИРОВКА
+   ============================================================ */
+function filteredSorted() {
+  const q = ui.q.trim().toLowerCase();
+
+  let list = tasks.filter(t => {
+    if (ui.subject !== 'all' && t.subject !== ui.subject) return false;
+    if (ui.priority !== 'all' && t.priority !== ui.priority) return false;
+    if (ui.overdue && !isOverdue(t)) return false;
+    if (q) {
+      const hay = `${t.title} ${t.subject} ${t.description || ''}`.toLowerCase();
+      if (!hay.includes(q)) return false;
+    }
+    return true;
+  });
+
+  const cmp = {
+    deadline: (a, b) => String(a.deadline).localeCompare(String(b.deadline)),
+    priority: (a, b) =>
+      (PRIORITY_META[a.priority]?.order ?? 9) - (PRIORITY_META[b.priority]?.order ?? 9) ||
+      String(a.deadline).localeCompare(String(b.deadline)),
+    created:  (a, b) => String(b.createdAt).localeCompare(String(a.createdAt)),
+    title:    (a, b) => a.title.localeCompare(b.title, 'ru')
+  }[ui.sort] || (() => 0);
+
+  return list.sort(cmp);
+}
+
+/* ============================================================
+   6. РЕНДЕР
+   ============================================================ */
+function deadlineBadge(t) {
+  const d = daysUntil(t.deadline);
+  const label = formatDate(t.deadline);
+  if (d === null) return { cls: '', text: 'без срока' };
+  if (t.status === 'done') return { cls: 'fine', text: label };
+  if (d < 0)  return { cls: 'over',  text: `Просрочено на ${Math.abs(d)} ${plural(Math.abs(d), 'день', 'дня', 'дней')}` };
+  if (d === 0) return { cls: 'today', text: 'Сегодня' };
+  if (d === 1) return { cls: 'soon',  text: 'Завтра' };
+  if (d <= 3)  return { cls: 'soon',  text: `Через ${d} ${plural(d, 'день', 'дня', 'дней')}` };
+  return { cls: '', text: label };
+}
+
+function taskCard(t) {
+  const p = PRIORITY_META[t.priority] || PRIORITY_META.medium;
+  const dl = deadlineBadge(t);
+  const est = t.estimateHours ? `${t.estimateHours} ч` : '—';
+  const isDone = t.status === 'done';
+
+  return `
+  <article class="task ${isDone ? 'done' : ''}" draggable="true" data-id="${escapeHtml(t.id)}" tabindex="0">
+    <div class="task-top">
+      <span class="prio ${escapeHtml(t.priority)}">${p.label}</span>
+      <div class="task-actions">
+        ${!isDone ? `<button data-act="next" title="Следующий статус" aria-label="Следующий статус">${ICON.next}</button>` : ''}
+        <button data-act="edit" title="Редактировать" aria-label="Редактировать">${ICON.edit}</button>
+        <button data-act="del" title="Удалить" aria-label="Удалить">${ICON.trash}</button>
+      </div>
+    </div>
+    <h4 class="task-title">${escapeHtml(t.title)}</h4>
+    ${t.description ? `<p class="task-desc">${escapeHtml(t.description)}</p>` : ''}
+    <div class="task-chips">
+      <span class="chip">${escapeHtml(t.subject)}</span>
+      <span class="chip">${escapeHtml(TYPE_LABEL[t.type] || t.type)}</span>
+    </div>
+    <div class="task-foot">
+      <span class="deadline ${dl.cls}">${ICON.cal}${escapeHtml(dl.text)}</span>
+      <span class="estimate">${ICON.clock}${est}</span>
+    </div>
+  </article>`;
+}
+
+function renderBoard() {
+  const list = filteredSorted();
+  STATUS_ORDER.forEach(st => {
+    const col = $(`.col[data-status="${st}"]`);
+    if (!col) return;
+    const items = list.filter(t => t.status === st);
+    col.querySelector('.col-count').textContent = items.length;
+    const body = col.querySelector('.col-body');
+    body.innerHTML = items.length
+      ? items.map(taskCard).join('')
+      : `<div class="empty">${STATUS_META[st].hint}</div>`;
+  });
+}
+
+function renderStats() {
+  const total = tasks.length;
+  const done = tasks.filter(t => t.status === 'done').length;
+  const active = tasks.filter(t => t.status === 'progress' || t.status === 'review').length;
+  const overdue = tasks.filter(isOverdue).length;
+  const hours = tasks.reduce((s, t) => s + (Number(t.estimateHours) || 0), 0);
+  const pct = total ? Math.round(done / total * 100) : 0;
+
+  $('#statTotal').firstChild.textContent = total + ' ';
+  $('#statTotalSub').textContent = `· ${hours % 1 ? hours.toFixed(1) : hours} ч`;
+
+  $('#statActive').firstChild.textContent = active + ' ';
+  $('#statActiveSub').textContent = `· ${tasks.filter(t => t.status === 'progress').length} в работе`;
+
+  $('#statOverdue').firstChild.textContent = overdue + ' ';
+  $('#statOverdueSub').textContent = overdue ? '· требует внимания' : '· всё под контролем';
+
+  $('#statDone').firstChild.textContent = done + ' ';
+  $('#statDoneSub').textContent = `· ${pct}% от всех`;
+
+  $('#progressBar').style.width = pct + '%';
+  $('#progressLabel').textContent = pct + '%';
+
+  $('#appTaskCounter').textContent =
+    `${total} ${plural(total, 'задача', 'задачи', 'задач')} · ${hours % 1 ? hours.toFixed(1) : hours} ч суммарно`;
+}
+
+function refreshSubjectFilter() {
+  const sel = $('#filterSubject');
+  const current = sel.value || 'all';
+  const subjects = Array.from(new Set(tasks.map(t => t.subject).filter(Boolean))).sort((a, b) => a.localeCompare(b, 'ru'));
+  sel.innerHTML = '<option value="all">Все предметы</option>' +
+    subjects.map(s => `<option value="${escapeHtml(s)}">${escapeHtml(s)}</option>`).join('');
+  sel.value = subjects.includes(current) ? current : 'all';
+  ui.subject = sel.value;
+
+  const dl = $('#subjectList');
+  if (dl) {
+    const all = Array.from(new Set([...SUBJECT_SUGGESTIONS, ...subjects]));
+    dl.innerHTML = all.map(s => `<option value="${escapeHtml(s)}"></option>`).join('');
+  }
+}
+
+function render() {
+  renderBoard();
+  renderStats();
+}
+
+/* ============================================================
+   7. УВЕДОМЛЕНИЯ
+   ============================================================ */
+function toast(message, { type = 'ok', action = null, duration = 4200 } = {}) {
+  const wrap = $('#toasts');
+  const el = document.createElement('div');
+  el.className = `toast ${type}`;
+  const ico = type === 'del'
+    ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>'
+    : type === 'info'
+      ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M12 8v.01M12 12v5"/></svg>'
+      : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg>';
+
+  el.innerHTML = `<span class="ico">${ico}</span><span>${escapeHtml(message)}</span>`;
+  if (action) {
+    const b = document.createElement('button');
+    b.textContent = action.label;
+    b.onclick = () => { action.fn(); close(); };
+    el.appendChild(b);
+  }
+  wrap.appendChild(el);
+
+  let timer = setTimeout(close, duration);
+  function close() {
+    clearTimeout(timer);
+    el.classList.add('out');
+    setTimeout(() => el.remove(), 220);
+  }
+  el.addEventListener('mouseenter', () => clearTimeout(timer));
+  el.addEventListener('mouseleave', () => { timer = setTimeout(close, 1800); });
+  return el;
+}
+
+/* ============================================================
+   8. МОДАЛЬНОЕ ОКНО
+   ============================================================ */
+const backdrop = $('#modalBackdrop');
+
+function clearErrors() {
+  $$('.field', $('#taskForm')).forEach(f => {
+    f.classList.remove('invalid');
+    const s = f.querySelector('.err span');
+    if (s) s.textContent = '';
+  });
+}
+function setError(field, msg) {
+  const f = $(`.field[data-field="${field}"]`, $('#taskForm'));
+  if (!f) return;
+  f.classList.add('invalid');
+  const s = f.querySelector('.err span');
+  if (s) s.textContent = msg;
+}
+
+function updateDescCounter() {
+  const v = $('#f-description').value;
+  const c = $('#descCounter');
+  const n = v.length;
+  c.textContent = `${n} / 500`;
+  c.classList.toggle('max', n >= 480);
+}
+
+function openModal(task = null) {
+  editingId = task ? task.id : null;
+  const form = $('#taskForm');
+  form.reset();
+  clearErrors();
+
+  $('#modalTitle').textContent = task ? 'Редактировать задачу' : 'Новая задача';
+  $('#modalSubtitle').textContent = task
+    ? 'Изменения сохранятся сразу после нажатия «Сохранить»'
+    : 'Заполните поля — все обязательные отмечены звёздочкой';
+  $('#deleteBtn').style.display = task ? 'inline-flex' : 'none';
+  $('#saveBtn').lastChild.textContent = task ? ' Сохранить' : ' Добавить задачу';
+
+  if (task) {
+    $('#f-title').value = task.title;
+    $('#f-subject').value = task.subject;
+    $('#f-type').value = task.type;
+    $('#f-priority').value = task.priority;
+    $('#f-status').value = task.status;
+    $('#f-deadline').value = task.deadline;
+    $('#f-estimate').value = task.estimateHours ?? '';
+    $('#f-description').value = task.description ?? '';
+  } else {
+    $('#f-priority').value = 'medium';
+    $('#f-status').value = 'todo';
+    $('#f-type').value = 'homework';
+    $('#f-deadline').value = addDays(3);
+    $('#f-estimate').value = '';
+    $('#f-description').value = '';
+  }
+
+  // минимально допустимая дата — сегодня (кроме режима редактирования прошлых задач)
+  const dl = $('#f-deadline');
+  const past = task && daysUntil(task.deadline) < 0;
+  dl.min = past ? '' : todayISO();
+
+  updateDescCounter();
+  backdrop.classList.add('open');
+  document.body.style.overflow = 'hidden';
+  setTimeout(() => $('#f-title').focus(), 60);
+}
+
+function closeModal() {
+  backdrop.classList.remove('open');
+  document.body.style.overflow = '';
+  editingId = null;
+}
+
+/* ============================================================
+   9. ОБРАБОТЧИКИ
+   ============================================================ */
+$('#addTaskBtn').addEventListener('click', () => openModal());
+$('#modalClose').addEventListener('click', closeModal);
+$('#cancelBtn').addEventListener('click', closeModal);
+backdrop.addEventListener('mousedown', e => { if (e.target === backdrop) closeModal(); });
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && backdrop.classList.contains('open')) closeModal();
+});
+
+$('#f-description').addEventListener('input', updateDescCounter);
+
+// живая проверка полей
+['title', 'subject', 'deadline', 'estimate', 'description'].forEach(field => {
+  const el = $(`#f-${field}`);
+  el.addEventListener('blur', () => {
+    const map = {
+      title: () => validateTitle(el.value),
+      subject: () => validateSubject(el.value),
+      deadline: () => validateDeadline(el.value, { allowPast: !!editingId && daysUntil($('#f-deadline').value) < 0 }),
+      estimate: () => validateEstimate(el.value),
+      description: () => validateDescription(el.value)
+    };
+    const r = map[field]();
+    const wrap = el.closest('.field');
+    if (!r.ok) { wrap.classList.add('invalid'); wrap.querySelector('.err span').textContent = r.msg; }
+    else { wrap.classList.remove('invalid'); }
+  });
+  el.addEventListener('input', () => {
+    const wrap = el.closest('.field');
+    if (wrap.classList.contains('invalid')) {
+      wrap.classList.remove('invalid');
+    }
+  });
+});
+
+// отправка формы
+$('#taskForm').addEventListener('submit', e => {
+  e.preventDefault();
+  clearErrors();
+
+  const raw = {
+    title: $('#f-title').value,
+    subject: $('#f-subject').value,
+    deadline: $('#f-deadline').value,
+    estimate: $('#f-estimate').value,
+    description: $('#f-description').value,
+    type: $('#f-type').value,
+    priority: $('#f-priority').value,
+    status: $('#f-status').value
+  };
+
+  // в режиме редактирования разрешаем сохранять уже просроченный срок
+  const allowPast = !!editingId && daysUntil($('#f-deadline').value) < 0;
+
+  const errors = validateTask({ ...raw, allowPast });
+  if (Object.keys(errors).length) {
+    Object.entries(errors).forEach(([k, msg]) => setError(k, msg));
+    const first = $('.field.invalid input, .field.invalid textarea');
+    if (first) first.focus();
+    toast('Проверьте выделенные поля формы', { type: 'del', duration: 3000 });
+    return;
+  }
+
+  const payload = {
+    title: validateTitle(raw.title).value,
+    subject: validateSubject(raw.subject).value,
+    deadline: validateDeadline(raw.deadline, { allowPast }).value,
+    estimateHours: validateEstimate(raw.estimate).value,
+    description: validateDescription(raw.description).value,
+    type: raw.type,
+    priority: raw.priority,
+    status: raw.status
+  };
+
+  if (editingId) {
+    updateTask(editingId, payload);
+    toast('Задача обновлена');
+  } else {
+    addTask(payload);
+    toast('Задача создана и сохранена');
+  }
+
+  closeModal();
+  refreshSubjectFilter();
+  render();
+});
+
+// удаление из модального окна
+$('#deleteBtn').addEventListener('click', () => {
+  if (!editingId) return;
+  const id = editingId;
+  closeModal();
+  removeTaskWithUndo(id);
+});
+
+// клики по карточкам
+$('#board').addEventListener('click', e => {
+  const btn = e.target.closest('[data-act]');
+  if (!btn) return;
+  const id = btn.closest('.task').dataset.id;
+  const act = btn.dataset.act;
+  if (act === 'edit') openModal(getTask(id));
+  if (act === 'del') removeTaskWithUndo(id);
+  if (act === 'next') advanceStatus(id);
+});
+
+function removeTaskWithUndo(id) {
+  const t = getTask(id);
+  if (!t) return;
+  const snapshot = deleteTask(id);
+  render();
+  toast(`Удалено: «${t.title.slice(0, 32)}${t.title.length > 32 ? '…' : ''}»`, {
+    type: 'del',
+    duration: 6000,
+    action: {
+      label: 'Отменить',
+      fn: () => { restoreTask(snapshot); refreshSubjectFilter(); render(); toast('Задача восстановлена'); }
+    }
+  });
+}
+
+/* ---------- drag & drop ---------- */
+const board = $('#board');
+
+board.addEventListener('dragstart', e => {
+  const card = e.target.closest('.task');
+  if (!card) return;
+  dragId = card.dataset.id;
+  card.classList.add('dragging');
+  e.dataTransfer.effectAllowed = 'move';
+  try { e.dataTransfer.setData('text/plain', dragId); } catch (err) {}
+});
+
+board.addEventListener('dragend', () => {
+  dragId = null;
+  $$('.task.dragging').forEach(c => c.classList.remove('dragging'));
+  $$('.col.drop-target').forEach(c => c.classList.remove('drop-target'));
+});
+
+board.addEventListener('dragover', e => {
+  const col = e.target.closest('.col');
+  if (!col) return;
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+  col.classList.add('drop-target');
+});
+
+board.addEventListener('dragleave', e => {
+  const col = e.target.closest('.col');
+  if (col && !col.contains(e.relatedTarget)) col.classList.remove('drop-target');
+});
+
+board.addEventListener('drop', e => {
+  const col = e.target.closest('.col');
+  if (!col) return;
+  e.preventDefault();
+  col.classList.remove('drop-target');
+  const id = e.dataTransfer.getData('text/plain') || dragId;
+  if (id) setStatus(id, col.dataset.status);
+});
+
+/* ---------- фильтры ---------- */
+$('#searchInput').addEventListener('input', e => {
+  ui.q = e.target.value;
+  renderBoard();
+});
+
+$('#filterSubject').addEventListener('change', e => {
+  ui.subject = e.target.value;
+  renderBoard();
+});
+
+$('#filterPriority').addEventListener('change', e => {
+  ui.priority = e.target.value;
+  renderBoard();
+});
+
+$('#sortBy').addEventListener('change', e => {
+  ui.sort = e.target.value;
+  renderBoard();
+});
+
+$('#overdueToggle').addEventListener('click', e => {
+  const btn = e.currentTarget;
+  ui.overdue = !ui.overdue;
+  btn.classList.toggle('on', ui.overdue);
+  renderBoard();
+});
+
+/* ============================================================
+   10. АВТОТЕСТЫ
+   ============================================================ */
+const TESTS = [
+  { id: 'AT-01', name: 'Пустое название отклоняется',            fn: () => validateTitle('').ok === false },
+  { id: 'AT-02', name: 'Название из пробелов отклоняется',       fn: () => validateTitle('    ').ok === false },
+  { id: 'AT-03', name: 'Название из 2 символов отклоняется',     fn: () => validateTitle('ДЗ').ok === false },
+  { id: 'AT-04', name: 'Название из 121 символа отклоняется',    fn: () => validateTitle('a'.repeat(121)).ok === false },
+  { id: 'AT-05', name: 'Корректное название принимается',        fn: () => validateTitle('  Решить задачи  ').value === 'Решить задачи' },
+  { id: 'AT-06', name: 'Пустой предмет отклоняется',             fn: () => validateSubject('').ok === false },
+  { id: 'AT-07', name: 'Пустой срок отклоняется',                fn: () => validateDeadline('').ok === false },
+  { id: 'AT-08', name: 'Прошедшая дата отклоняется',             fn: () => validateDeadline(addDays(-1)).ok === false },
+  { id: 'AT-09', name: 'Сегодняшняя дата принимается',           fn: () => validateDeadline(addDays(0)).ok === true },
+  { id: 'AT-10', name: 'Несуществующая дата 2025-02-30 отклоняется', fn: () => validateDeadline('2025-02-30').ok === false },
+  { id: 'AT-11', name: 'Оценка 0 часов отклоняется',             fn: () => validateEstimate('0').ok === false },
+  { id: 'AT-12', name: 'Оценка 150 часов отклоняется',           fn: () => validateEstimate('150').ok === false },
+  { id: 'AT-13', name: 'Оценка «2,5» принимается как 2.5',       fn: () => validateEstimate('2,5').value === 2.5 },
+  { id: 'AT-14', name: 'Пустая оценка допустима (null)',         fn: () => validateEstimate('').value === null },
+  { id: 'AT-15', name: 'Описание длиннее 500 символов отклоняется', fn: () => validateDescription('x'.repeat(501)).ok === false },
+  { id: 'AT-16', name: 'HTML-теги экранируются',                 fn: () => escapeHtml('<img src=x onerror=alert(1)>').indexOf('<') === -1 },
+  { id: 'AT-17', name: 'Фильтр «просроченные» работает корректно', fn: () => {
+      const sample = [
+        { deadline: addDays(-1), status: 'todo' },
+        { deadline: addDays(3),  status: 'todo' },
+        { deadline: addDays(-2), status: 'done' }
+      ];
+      return sample.filter(isOverdue).length === 1;
+    } }
+];
+
+function runTests() {
+  const container = $('#testResults');
+  container.innerHTML = '';
+  let passed = 0;
+
+  const results = TESTS.map(t => {
+    let ok = false;
+    try { ok = !!t.fn(); } catch (err) { ok = false; }
+    if (ok) passed++;
+    return { ...t, ok };
+  });
+
+  results.forEach(r => {
+    const row = document.createElement('div');
+    row.className = `tres ${r.ok ? 'pass' : 'fail'}`;
+    row.innerHTML = `
+      <span class="mk">${r.ok ? '✓' : '✕'}</span>
+      <span class="nm">${escapeHtml(r.name)}</span>
+      <span class="id">${r.id}</span>`;
+    container.appendChild(row);
+  });
+
+  const total = results.length;
+  const pct = Math.round(passed / total * 100);
+  const ring = $('#runRing');
+  ring.style.background = `conic-gradient(${pct === 100 ? '#10b981' : '#f59e0b'} ${pct * 3.6}deg, #e8edf7 0deg)`;
+  $('#runRingText').textContent = `${passed}/${total}`;
+  $('#runSummaryText').textContent =
+    pct === 100 ? `Все ${total} проверок пройдены успешно` :
+    `Пройдено ${passed} из ${total} · ${total - passed} ${plural(total - passed, 'ошибка', 'ошибки', 'ошибок')}`;
+
+  toast(pct === 100 ? `Все ${total} автотестов пройдены ✓` : `Пройдено ${passed} из ${total} тестов`,
+        { type: pct === 100 ? 'ok' : 'del' });
+
+  return { passed, total };
+}
+
+$('#runTestsBtn').addEventListener('click', runTests);
+$('#heroRunTests').addEventListener('click', () => {
+  document.getElementById('tests').scrollIntoView({ behavior: 'smooth' });
+  setTimeout(runTests, 420);
+});
+
+/* ============================================================
+   11. ИНИЦИАЛИЗАЦИЯ
+   ============================================================ */
+(function init() {
+  // дата в шапке приложения
+  $('#appToday').textContent = new Date().toLocaleDateString('ru-RU', {
+    weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
+  });
+
+  tasks = loadTasks();
+  saveTasks();               // фиксируем демо-набор при первом запуске
+  refreshSubjectFilter();
+  render();
+
+  // приветственная подсказка
+  setTimeout(() => {
+    toast('Совет: карточку можно перетащить в другую колонку', { type: 'info', duration: 5200 });
+  }, 900);
+})();
+</script>
+</body>
+</html>
