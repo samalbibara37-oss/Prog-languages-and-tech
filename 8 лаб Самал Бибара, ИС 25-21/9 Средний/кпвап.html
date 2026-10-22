@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Учет расходов (Тенге)</title>
+<style>
+  :root {
+    --bg: #f4f7f6;
+    --card-bg: #ffffff;
+    --text-main: #2d3748;
+    --text-muted: #718096;
+    --primary: #319795; /* Приятный бирюзовый цвет */
+    --primary-hover: #2c7a7b;
+    --danger: #e53e3e;
+    --danger-hover: #c53030;
+    --border: #e2e8f0;
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background-color: var(--bg);
+    color: var(--text-main);
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    padding: 40px 20px;
+  }
+
+  .dashboard {
+    background: var(--card-bg);
+    width: 100%;
+    max-width: 500px;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    border: 1px solid var(--border);
+  }
+
+  /* --- Шапка с общей суммой --- */
+  .header {
+    background: linear-gradient(135deg, #319795, #285e61);
+    padding: 30px;
+    color: white;
+    text-align: center;
+  }
+
+  .header h2 {
+    font-size: 16px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    opacity: 0.9;
+    margin-bottom: 8px;
+  }
+
+  .total-amount {
+    font-size: 42px;
+    font-weight: 700;
+    letter-spacing: -1px;
+  }
+
+  /* --- Форма добавления --- */
+  .form-container {
+    padding: 24px;
+    border-bottom: 1px solid var(--border);
+    background: #fafbfc;
+  }
+
+  .input-group {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+
+  .input-group:last-child {
+    margin-bottom: 0;
+  }
+
+  input, select {
+    width: 100%;
+    padding: 12px 14px;
+    font-size: 14px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    font-family: inherit;
+    background: white;
+  }
+
+  input:focus, select:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(49, 151, 149, 0.15);
+  }
+
+  /* Убираем стрелочки у number input */
+  input[type=number]::-webkit-inner-spin-button, 
+  input[type=number]::-webkit-outer-spin-button { 
+    -webkit-appearance: none; 
+    margin: 0; 
+  }
+
+  button.btn-add {
+    width: 100%;
+    padding: 14px;
+    background-color: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+
+  button.btn-add:hover {
+    background-color: var(--primary-hover);
+  }
+
+  /* --- Список операций --- */
+  .expenses-list {
+    padding: 10px 24px;
+    max-height: 350px;
+    overflow-y: auto;
+  }
+
+  .expenses-list::-webkit-scrollbar { width: 6px; }
+  .expenses-list::-webkit-scrollbar-track { background: transparent; }
+  .expenses-list::-webkit-scrollbar-thumb { background: #cbd5e0; border-radius: 10px; }
+
+  .expense-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 0;
+    border-bottom: 1px dashed var(--border);
+    animation: slideIn 0.3s ease forwards;
+  }
+
+  .expense-item:last-child {
+    border-bottom: none;
+  }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .expense-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .expense-category {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-main);
+  }
+
+  .expense-date {
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+
+  .expense-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .expense-amount {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text-main);
+  }
+
+  .btn-delete {
+    background: none;
+    border: none;
+    color: #cbd5e0;
+    cursor: pointer;
+    font-size: 20px;
+    line-height: 1;
+    padding: 4px;
+    border-radius: 4px;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .btn-delete:hover {
+    color: var(--danger);
+    background: #fff5f5;
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--text-muted);
+    font-size: 14px;
+  }
+
+  .empty-state svg {
+    width: 48px;
+    height: 48px;
+    margin-bottom: 12px;
+    opacity: 0.3;
+  }
+</style>
+</head>
+<body>
+
+<div class="dashboard">
+  <!-- Шапка с общей суммой -->
+  <div class="header">
+    <h2>Общий расход</h2>
+    <!-- Заменили символ на тенге -->
+    <div class="total-amount" id="totalAmount">0 ₸</div>
+  </div>
+
+  <!-- Форма добавления -->
+  <div class="form-container">
+    <form id="expenseForm">
+      <div class="input-group">
+        <input type="text" id="category" placeholder="Категория (Еда, Транспорт...)" list="categories" required autocomplete="off">
+        <datalist id="categories">
+          <option value="Еда"><option value="Транспорт"><option value="Развлечения">
+          <option value="Жилье"><option value="Здоровье"><option value="Одежда">
+          <option value="Коммуналка"><option value="Связь">
+        </datalist>
+        <input type="number" id="amount" placeholder="Сумма (₸)" min="1" step="0.01" required autocomplete="off">
+      </div>
+      <div class="input-group">
+        <input type="date" id="date" required>
+        <button type="submit" class="btn-add">Добавить расход</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Список операций -->
+  <div class="expenses-list" id="expensesList">
+    <!-- Сюда будут добавляться элементы -->
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const STORAGE_KEY = 'expense_tracker_kzt_v1'; // Обновили ключ для чистоты данных
+    
+    const form = document.getElementById('expenseForm');
+    const categoryInput = document.getElementById('category');
+    const amountInput = document.getElementById('amount');
+    const dateInput = document.getElementById('date');
+    const totalAmountEl = document.getElementById('totalAmount');
+    const expensesList = document.getElementById('expensesList');
+
+    let expenses = [];
+
+    // Установка сегодняшней даты по умолчанию
+    const today = new Date().toISOString().split('T')[0];
+    dateInput.value = today;
+
+    // 1. Загрузка данных
+    function loadExpenses() {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        try {
+          expenses = JSON.parse(saved);
+          renderList();
+        } catch (e) {
+          console.error('Ошибка чтения данных', e);
+        }
+      } else {
+        renderList();
+      }
+    }
+
+    // 2. Сохранение данных
+    function saveExpenses() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(expenses));
+    }
+
+    // 3. Отрисовка списка и подсчет суммы
+    function renderList() {
+      expensesList.innerHTML = '';
+
+      // Считаем общую сумму
+      const total = expenses.reduce((sum, item) => sum + item.amount, 0);
+      
+      // Форматируем вывод в ТЕНГЕ (KZT)
+      // Локаль 'ru-KZ' или 'kk-KZ' отлично форматирует тенге
+      totalAmountEl.textContent = new Intl.NumberFormat('ru-KZ', {
+        style: 'currency',
+        currency: 'KZT',
+        maximumFractionDigits: 0 // Убираем копейки/тиыны для красоты
+      }).format(total);
+
+      if (expenses.length === 0) {
+        expensesList.innerHTML = `
+          <div class="empty-state">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="12"></line>
+              <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+            <p>У вас пока нет расходов.<br>Добавьте первую операцию!</p>
+          </div>
+        `;
+        return;
+      }
+
+      // Сортируем по дате (новые сверху)
+      const sortedExpenses = [...expenses].sort((a, b) => new Date(b.date) - new Date(a.date));
+
+      sortedExpenses.forEach(expense => {
+        const [y, m, d] = expense.date.split('-');
+        const formattedDate = `${d}.${m}.${y}`;
+
+        const el = document.createElement('div');
+        el.className = 'expense-item';
+        el.innerHTML = `
+          <div class="expense-info">
+            <span class="expense-category">${escapeHtml(expense.category)}</span>
+            <span class="expense-date">${formattedDate}</span>
+          </div>
+          <div class="expense-right">
+            <!-- Здесь также выводим тенге -->
+            <span class="expense-amount">${expense.amount.toLocaleString('ru-RU')} ₸</span>
+            <button class="btn-delete" data-id="${expense.id}" title="Удалить">✕</button>
+          </div>
+        `;
+        expensesList.appendChild(el);
+      });
+    }
+
+    // 4. Добавление
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+
+      const category = categoryInput.value.trim();
+      const amount = parseFloat(amountInput.value);
+      const date = dateInput.value;
+
+      if (!category || isNaN(amount) || amount <= 0 || !date) {
+        alert('Пожалуйста, заполните все поля корректно. Сумма должна быть больше нуля.');
+        return;
+      }
+
+      const newExpense = {
+        id: Date.now().toString(),
+        category: category,
+        amount: amount,
+        date: date
+      };
+
+      expenses.push(newExpense);
+      saveExpenses();
+      renderList();
+
+      categoryInput.value = '';
+      amountInput.value = '';
+      dateInput.value = today;
+      categoryInput.focus();
+    });
+
+    // 5. Удаление
+    expensesList.addEventListener('click', (e) => {
+      if (e.target.classList.contains('btn-delete')) {
+        const idToDelete = e.target.getAttribute('data-id');
+        expenses = expenses.filter(item => item.id !== idToDelete);
+        saveExpenses();
+        renderList();
+      }
+    });
+
+    // Защита от XSS
+    function escapeHtml(text) {
+      const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+      return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+    }
+
+    loadExpenses();
+  });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Персональная анкета</title>
+<style>
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+    background-color: #f4f6f8;
+    color: #333;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+  }
+
+  .card {
+    background: #ffffff;
+    width: 100%;
+    max-width: 420px;
+    padding: 32px;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    border: 1px solid #eaeaea;
+  }
+
+  h2 {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 24px;
+    text-align: center;
+    color: #1a1a1a;
+  }
+
+  .field {
+    margin-bottom: 18px;
+  }
+
+  label {
+    display: block;
+    font-size: 13px;
+    font-weight: 500;
+    margin-bottom: 6px;
+    color: #555;
+  }
+
+  input {
+    width: 100%;
+    padding: 10px 12px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    outline: none;
+    transition: border-color 0.2s;
+    font-family: inherit;
+  }
+
+  input:focus {
+    border-color: #4a90e2;
+    box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+  }
+
+  .actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 28px;
+  }
+
+  button {
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: none;
+    font-family: inherit;
+  }
+
+  .btn-primary {
+    background-color: #4a90e2;
+    color: #fff;
+    flex: 1; /* Кнопка сохранить занимает всё свободное место */
+  }
+
+  .btn-primary:hover {
+    background-color: #357abd;
+  }
+
+  .btn-reset {
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    color: #666;
+  }
+
+  .btn-reset:hover {
+    background: #f5f5f5;
+    color: #333;
+    border-color: #ccc;
+  }
+
+  /* Индикатор сохранения */
+  .save-status {
+    font-size: 13px;
+    color: #28a745;
+    font-weight: 500;
+    text-align: center;
+    margin-top: 15px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    height: 20px;
+  }
+
+  .save-status.visible {
+    opacity: 1;
+  }
+</style>
+</head>
+<body>
+
+<div class="card">
+  <h2>Персональная анкета</h2>
+
+  <form id="profileForm">
+    <div class="field">
+      <label for="name">Имя</label>
+      <input type="text" id="name" placeholder="Например: Иван Иванов" autocomplete="off">
+    </div>
+
+    <div class="field">
+      <label for="group">Группа</label>
+      <input type="text" id="group" placeholder="Например: ИС25-21" autocomplete="off">
+    </div>
+
+    <div class="field">
+      <label for="city">Город</label>
+      <input type="text" id="city" placeholder="Например: Алматы" autocomplete="off">
+    </div>
+
+    <div class="actions">
+      <button type="button" class="btn-reset" id="resetBtn">Очистить</button>
+      <button type="submit" class="btn-primary">Сохранить</button>
+    </div>
+    
+    <div class="save-status" id="saveStatus">Данные успешно сохранены!</div>
+  </form>
+</div>
+
+<script>
+  // Ждем полной загрузки HTML, прежде чем запускать скрипт
+  document.addEventListener('DOMContentLoaded', () => {
+    
+    const STORAGE_KEY = 'personal_questionnaire_data_v2'; // Изменили ключ, чтобы сбросить старые сломанные данные
+
+    const form = document.getElementById('profileForm');
+    const nameInput = document.getElementById('name');
+    const groupInput = document.getElementById('group');
+    const cityInput = document.getElementById('city');
+    const resetBtn = document.getElementById('resetBtn');
+    const saveStatus = document.getElementById('saveStatus');
+
+    let statusTimeout;
+
+    // 1. Восстановление данных
+    function loadData() {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        try {
+          const data = JSON.parse(saved);
+          nameInput.value = data.name || '';
+          groupInput.value = data.group || '';
+          cityInput.value = data.city || '';
+        } catch (e) {
+          console.error('Ошибка чтения данных', e);
+        }
+      }
+    }
+
+    // 2. Сохранение данных
+    function saveData() {
+      const data = {
+        name: nameInput.value.trim(),
+        group: groupInput.value.trim(),
+        city: cityInput.value.trim()
+      };
+      
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+      
+      // Показываем сообщение
+      saveStatus.classList.add('visible');
+      clearTimeout(statusTimeout);
+      statusTimeout = setTimeout(() => {
+        saveStatus.classList.remove('visible');
+      }, 2500);
+    }
+
+    // 3. Очистка
+    function resetData() {
+      nameInput.value = '';
+      groupInput.value = '';
+      cityInput.value = '';
+      localStorage.removeItem(STORAGE_KEY);
+      saveStatus.classList.remove('visible');
+    }
+
+    // --- Слушатели событий ---
+
+    // Сохранение при нажатии на кнопку "Сохранить" или Enter
+    form.addEventListener('submit', (e) => {
+      e.preventDefault(); // Останавливаем перезагрузку страницы
+      saveData();
+    });
+
+    // Очистка
+    resetBtn.addEventListener('click', resetData);
+
+    // Автосохранение при вводе (чтобы данные не терялись, даже если не нажать кнопку)
+    nameInput.addEventListener('input', saveData);
+    groupInput.addEventListener('input', saveData);
+    cityInput.addEventListener('input', saveData);
+
+    // Запускаем восстановление при открытии
+    loadData();
+  });
+</script>
+
+</body>
+</html>

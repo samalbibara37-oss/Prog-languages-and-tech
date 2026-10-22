@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Бронирование аудиторий | Project Level</title>
+<style>
+  :root {
+    --bg: #f0f4f8;
+    --surface: #ffffff;
+    --primary: #3b82f6;
+    --primary-hover: #2563eb;
+    --text: #1e293b;
+    --text-muted: #64748b;
+    --border: #e2e8f0;
+    --danger: #ef4444;
+    --danger-bg: #fef2f2;
+    --success: #10b981;
+    --success-bg: #ecfdf5;
+    --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    --radius: 12px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+
+  body {
+    background-color: var(--bg);
+    color: var(--text);
+    display: flex;
+    justify-content: center;
+    padding: 40px 20px;
+    min-height: 100vh;
+  }
+
+  .container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    max-width: 1000px;
+    width: 100%;
+  }
+
+  @media (max-width: 768px) {
+    .container { grid-template-columns: 1fr; }
+  }
+
+  /* --- Панели --- */
+  .panel {
+    background: var(--surface);
+    padding: 32px;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+    height: fit-content;
+  }
+
+  h2 {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  /* --- Форма --- */
+  .form-group { margin-bottom: 20px; }
+
+  label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+  }
+
+  input, select {
+    width: 100%;
+    padding: 12px 14px;
+    font-size: 15px;
+    color: var(--text);
+    background: #f8fafc;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    outline: none;
+    transition: all 0.2s;
+  }
+
+  input:focus, select:focus {
+    background: #fff;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+  }
+
+  .time-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  button.btn-primary {
+    width: 100%;
+    padding: 14px;
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+    margin-top: 8px;
+  }
+
+  button.btn-primary:hover { background: var(--primary-hover); }
+
+  /* --- Уведомления --- */
+  .alert {
+    padding: 14px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 20px;
+    display: none;
+    animation: slideIn 0.3s ease;
+    line-height: 1.5;
+  }
+
+  .alert.error {
+    display: block;
+    background: var(--danger-bg);
+    color: var(--danger);
+    border: 1px solid #fecaca;
+  }
+
+  .alert.success {
+    display: block;
+    background: var(--success-bg);
+    color: var(--success);
+    border: 1px solid #a7f3d0;
+  }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(-5px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* --- Список бронирований --- */
+  .schedule-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .schedule-header span {
+    font-size: 14px;
+    background: #e0e7ff;
+    color: #4338ca;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-weight: 600;
+  }
+
+  .booking-list {
+    max-height: 400px;
+    overflow-y: auto;
+    padding-right: 8px;
+  }
+
+  .booking-list::-webkit-scrollbar { width: 6px; }
+  .booking-list::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+
+  .booking-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+    background: #f8fafc;
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--primary);
+    border-radius: 8px;
+    margin-bottom: 12px;
+    transition: transform 0.2s;
+    animation: slideIn 0.3s ease;
+  }
+
+  .booking-card:hover { transform: translateX(4px); }
+
+  .booking-info h4 { font-size: 15px; margin-bottom: 4px; }
+  .booking-time { font-size: 13px; color: var(--text-muted); font-weight: 500; }
+
+  .btn-delete {
+    background: white;
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+  }
+
+  .btn-delete:hover { background: var(--danger-bg); color: var(--danger); border-color: #fca5a5; }
+
+  .empty-state {
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 14px;
+    padding: 30px 0;
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <!-- Левая колонка: Форма -->
+  <div class="panel">
+    <h2>📅 Новая бронь</h2>
+    
+    <div id="alertBox" class="alert"></div>
+
+    <form id="bookingForm">
+      <div class="form-group">
+        <label for="room">Помещение</label>
+        <select id="room" required>
+          <option value="101">Аудитория 101</option>
+          <option value="102">Аудитория 102</option>
+          <option value="Coworking">Коворкинг</option>
+          <option value="Lab">IT-Лаборатория</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="date">Дата</label>
+        <input type="date" id="date" required>
+      </div>
+
+      <div class="time-row">
+        <div class="form-group">
+          <label for="startTime">Время начала</label>
+          <input type="time" id="startTime" required>
+        </div>
+        <div class="form-group">
+          <label for="endTime">Время окончания</label>
+          <input type="time" id="endTime" required>
+        </div>
+      </div>
+
+      <button type="submit" class="btn-primary">Забронировать</button>
+    </form>
+  </div>
+
+  <!-- Правая колонка: Расписание -->
+  <div class="panel">
+    <div class="schedule-header">
+      <h2>📋 Расписание</h2>
+      <span id="scheduleDate">Сегодня</span>
+    </div>
+    
+    <div class="booking-list" id="bookingList">
+      <!-- Сюда рендерятся записи -->
+    </div>
+  </div>
+</div>
+
+<script>
+  // ==========================================
+  // ЯДРО ПРИЛОЖЕНИЯ (Обернуто в DOMContentLoaded)
+  // ==========================================
+  document.addEventListener('DOMContentLoaded', () => {
+    
+    // Ключ для хранения. Версия v3, чтобы сбросить старые баги.
+    const STORAGE_KEY = 'room_booking_app_v3';
+    
+    // Элементы DOM
+    const form = document.getElementById('bookingForm');
+    const roomSelect = document.getElementById('room');
+    const dateInput = document.getElementById('date');
+    const startTimeInput = document.getElementById('startTime');
+    const endTimeInput = document.getElementById('endTime');
+    const bookingList = document.getElementById('bookingList');
+    const scheduleDate = document.getElementById('scheduleDate');
+    const alertBox = document.getElementById('alertBox');
+
+    // Глобальный массив записей
+    let bookings = [];
+
+    // --- 1. ИНИЦИАЛИЗАЦИЯ И ЗАГРУЗКА ---
+    function init() {
+      const todayStr = new Date().toISOString().split('T')[0];
+      dateInput.value = todayStr;
+      dateInput.min = todayStr;
+
+      // Загружаем из памяти
+      const saved = localStorage.getItem(STORAGE_KEY);
+      
+      if (saved) {
+        try {
+          bookings = JSON.parse(saved);
+          if (bookings.length > 0) {
+            showAlert(`Успешно загружено ${bookings.length} записей из памяти.`, 'success');
+          }
+        } catch (e) {
+          console.error("Ошибка парсинга", e);
+          bookings = [];
+        }
+      } else {
+        // СОЗДАЕМ ТЕСТОВУЮ ЗАПИСЬ, ЧТОБЫ ДОКАЗАТЬ, ЧТО СОХРАНЕНИЕ РАБОТАЕТ
+        bookings = [{
+          id: "demo-1",
+          room: "101",
+          date: todayStr,
+          start: "10:00",
+          end: "12:00"
+        }];
+        saveToStorage();
+      }
+
+      renderSchedule();
+    }
+
+    // --- 2. СОХРАНЕНИЕ ---
+    function saveToStorage() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(bookings));
+      } catch (e) {
+        showAlert("Ошибка! Браузер запретил сохранение данных.", "error");
+      }
+    }
+
+    // --- 3. УВЕДОМЛЕНИЯ ---
+    function showAlert(message, type) {
+      alertBox.textContent = message;
+      alertBox.className = `alert ${type}`;
+      
+      // Очистка таймера при повторном вызове
+      if (window.alertTimeout) clearTimeout(window.alertTimeout);
+      
+      // Скрываем через 5 секунд, если это успех
+      if (type === 'success') {
+        window.alertTimeout = setTimeout(() => {
+          alertBox.className = 'alert';
+        }, 5000);
+      }
+    }
+
+    // --- 4. ЛОГИКА КОНФЛИКТОВ ---
+    // Проверяет, пересекается ли новое время с уже существующими записями
+    function findConflict(room, date, newStart, newEnd) {
+      // Ищем записи только для этой комнаты и этой даты
+      const sameDayBookings = bookings.filter(b => b.room === room && b.date === date);
+
+      for (let i = 0; i < sameDayBookings.length; i++) {
+        const existing = sameDayBookings[i];
+        
+        // МАГИЯ ПЕРЕСЕЧЕНИЯ ИНТЕРВАЛОВ:
+        // Конфликт есть, если (Новое начало < Существующего конца) И (Новый конец > Существующего начала)
+        // Строки формата "HH:MM" отлично сравниваются лексикографически в JS.
+        if (newStart < existing.end && newEnd > existing.start) {
+          return existing; // Возвращаем запись, с которой конфликт
+        }
+      }
+      return null; // Конфликтов нет
+    }
+
+    // --- 5. ОТРИСОВКА СПИСКА ---
+    function renderSchedule() {
+      const currentRoom = roomSelect.value;
+      const currentDate = dateInput.value;
+
+      // Форматируем дату для красоты
+      const [y, m, d] = currentDate.split('-');
+      scheduleDate.textContent = currentDate === new Date().toISOString().split('T')[0] 
+        ? 'Сегодня' : `${d}.${m}.${y}`;
+
+      // Фильтруем по комнате и дате
+      const filtered = bookings.filter(b => b.room === currentRoom && b.date === currentDate);
+      
+      // Сортируем по времени начала
+      filtered.sort((a, b) => a.start.localeCompare(b.start));
+
+      bookingList.innerHTML = '';
+
+      if (filtered.length === 0) {
+        bookingList.innerHTML = `<div class="empty-state">На это время комната полностью свободна.</div>`;
+        return;
+      }
+
+      filtered.forEach(booking => {
+        const card = document.createElement('div');
+        card.className = 'booking-card';
+        card.innerHTML = `
+          <div class="booking-info">
+            <h4>Аудитория ${booking.room}</h4>
+            <div class="booking-time">${booking.start} — ${booking.end}</div>
+          </div>
+          <button class="btn-delete" data-id="${booking.id}" title="Удалить бронь">✕</button>
+        `;
+        bookingList.appendChild(card);
+      });
+    }
+
+    // --- 6. ОБРАБОТКА ФОРМЫ (ДОБАВЛЕНИЕ) ---
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+
+      const room = roomSelect.value;
+      const date = dateInput.value;
+      const start = startTimeInput.value;
+      const end = endTimeInput.value;
+
+      // Базовая валидация
+      if (start >= end) {
+        showAlert('Ошибка: Время окончания должно быть строго позже времени начала.', 'error');
+        return;
+      }
+
+      // Проверка на конфликт
+      const conflict = findConflict(room, date, start, end);
+
+      if (conflict) {
+        showAlert(`КОНФЛИКТ! Аудитория ${room} уже занята с ${conflict.start} до ${conflict.end}. Выберите другое время.`, 'error');
+        return;
+      }
+
+      // Если всё ок — создаем запись
+      const newBooking = {
+        id: 'booking_' + Date.now(),
+        room: room,
+        date: date,
+        start: start,
+        end: end
+      };
+
+      bookings.push(newBooking);
+      saveToStorage();
+      renderSchedule();
+
+      showAlert('Успешно! Комната забронирована и запись сохранена.', 'success');
+      
+      // Очищаем время
+      startTimeInput.value = '';
+      endTimeInput.value = '';
+    });
+
+    // --- 7. УДАЛЕНИЕ ---
+    bookingList.addEventListener('click', (e) => {
+      if (e.target.classList.contains('btn-delete')) {
+        const id = e.target.getAttribute('data-id');
+        
+        if (confirm('Вы уверены, что хотите отменить эту бронь?')) {
+          bookings = bookings.filter(b => b.id !== id);
+          saveToStorage();
+          renderSchedule();
+          showAlert('Бронь отменена.', 'success');
+        }
+      }
+    });
+
+    // --- 8. СМЕНА ФИЛЬТРОВ ---
+    // Если пользователь меняет комнату или дату в форме, список справа обновляется
+    roomSelect.addEventListener('change', renderSchedule);
+    dateInput.addEventListener('change', renderSchedule);
+
+    // Запуск приложения
+    init();
+  });
+</script>
+
+</body>
+</html>
