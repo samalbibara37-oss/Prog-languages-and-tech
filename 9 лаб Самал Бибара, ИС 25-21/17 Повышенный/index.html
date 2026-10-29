@@ -1,0 +1,178 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#111827">
+    <title>PeopleSpace — интерактивный каталог</title>
+    <link rel="stylesheet" href="./style.css">
+    <script src="./app.js" defer></script>
+</head>
+<body>
+    <header class="topbar">
+        <a class="brand" href="#">
+            <span class="brand-icon">P</span>
+            <span>People<span class="brand-accent">Space</span></span>
+        </a>
+        <div class="topbar-label">
+            <span class="online-dot"></span>
+            Интерактивный каталог
+        </div>
+    </header>
+
+    <main class="page">
+        <section class="hero">
+            <div class="hero-copy">
+                <span class="eyebrow">ЛАБОРАТОРНАЯ РАБОТА №9 · FETCH API</span>
+                <h1>Истории людей.<br><span>Мнения сообщества.</span></h1>
+                <p>
+                    Выбирайте пользователей, изучайте их публикации
+                    и читайте комментарии в одном месте.
+                </p>
+            </div>
+            <div class="hero-art" aria-hidden="true">
+                <div class="art-circle circle-one"></div>
+                <div class="art-circle circle-two"></div>
+                <div class="art-card">
+                    <span class="art-symbol">✳</span>
+                    <span class="art-line"></span>
+                    <span class="art-line short"></span>
+                    <span class="art-line"></span>
+                </div>
+                <div class="art-bubble">10</div>
+            </div>
+        </section>
+
+        <section class="stats">
+            <div class="stat-card">
+                <span class="stat-icon purple">♙</span>
+                <div>
+                    <span class="stat-label">Пользователи</span>
+                    <strong id="userCount">—</strong>
+                </div>
+            </div>
+            <div class="stat-card">
+                <span class="stat-icon blue">▤</span>
+                <div>
+                    <span class="stat-label">Публикации</span>
+                    <strong id="postCount">—</strong>
+                </div>
+            </div>
+            <div class="stat-card">
+                <span class="stat-icon green">☷</span>
+                <div>
+                    <span class="stat-label">Комментарии</span>
+                    <strong id="commentCount">—</strong>
+                </div>
+            </div>
+        </section>
+
+        <div id="globalStatus" class="global-status" role="status">
+            <span class="spinner"></span>
+            Загружаем список пользователей...
+        </div>
+
+        <section class="workspace">
+            <aside class="sidebar">
+                <div class="section-title">
+                    <div>
+                        <span class="eyebrow">СООБЩЕСТВО</span>
+                        <h2>Пользователи</h2>
+                    </div>
+                    <span class="count-pill" id="sidebarCount">0</span>
+                </div>
+
+                <label class="search-box">
+                    <span>⌕</span>
+                    <input id="userSearch" type="search"
+                           placeholder="Найти пользователя..."
+                           autocomplete="off">
+                </label>
+
+                <div id="usersList" class="users-list"></div>
+            </aside>
+
+            <section class="content">
+                <div id="welcome" class="welcome-panel">
+                    <div class="welcome-icon">✦</div>
+                    <h2>Всё начинается с человека</h2>
+                    <p>
+                        Выберите пользователя слева, чтобы загрузить
+                        его публикации. Затем откройте публикацию,
+                        чтобы прочитать комментарии.
+                    </p>
+                    <div class="steps">
+                        <div><span>01</span> Пользователь</div>
+                        <span class="step-arrow">→</span>
+                        <div><span>02</span> Публикации</div>
+                        <span class="step-arrow">→</span>
+                        <div><span>03</span> Комментарии</div>
+                    </div>
+                </div>
+
+                <div id="profile" class="profile-panel" hidden>
+                    <div class="profile-cover">
+                        <span class="cover-decoration">✳</span>
+                    </div>
+                    <div class="profile-main">
+                        <div id="profileAvatar" class="profile-avatar">U</div>
+                        <div class="profile-details">
+                            <span class="eyebrow">ПРОФИЛЬ ПОЛЬЗОВАТЕЛЯ</span>
+                            <h2 id="profileName">Имя пользователя</h2>
+                            <p id="profileUsername" class="muted"></p>
+                        </div>
+                    </div>
+
+                    <div class="profile-info">
+                        <div class="info-box">
+                            <span class="info-label">Электронная почта</span>
+                            <span id="profileEmail" class="info-value"></span>
+                        </div>
+                        <div class="info-box">
+                            <span class="info-label">Город</span>
+                            <span id="profileCity" class="info-value"></span>
+                        </div>
+                        <div class="info-box">
+                            <span class="info-label">Компания</span>
+                            <span id="profileCompany" class="info-value"></span>
+                        </div>
+                    </div>
+
+                    <div class="section-title posts-title">
+                        <div>
+                            <span class="eyebrow">ЛИЧНЫЙ БЛОГ</span>
+                            <h2>Публикации</h2>
+                        </div>
+                        <span class="count-pill" id="profilePostCount">0</span>
+                    </div>
+
+                    <div id="postsStatus" class="inline-status" role="status"></div>
+                    <div id="postsList" class="posts-list"></div>
+
+                    <section id="commentsSection" class="comments-section" hidden>
+                        <div class="section-title comments-heading">
+                            <div>
+                                <span class="eyebrow">ОБСУЖДЕНИЕ</span>
+                                <h2>Комментарии</h2>
+                            </div>
+                            <span class="count-pill" id="selectedCommentCount">0</span>
+                        </div>
+
+                        <div id="selectedPost" class="selected-post"></div>
+                        <div id="commentsStatus" class="inline-status" role="status"></div>
+                        <div id="commentsList" class="comments-list"></div>
+                    </section>
+                </div>
+            </section>
+        </section>
+
+        <footer>
+            <span class="brand-icon small">P</span>
+            <span>PeopleSpace</span>
+            <span class="footer-divider">·</span>
+            <span>Учебный проект на Fetch API</span>
+        </footer>
+    </main>
+</body>
+</html>

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PeopleSpace — пользователи и публикации</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="app.js" defer></script>
+</head>
+<body>
+    <header class="hero">
+        <div class="hero-icon">✦</div>
+        <p class="eyebrow">USER DIRECTORY</p>
+        <h1>Люди и их истории<span>.</span></h1>
+        <p class="subtitle">
+            Знакомьтесь с пользователями и открывайте их публикации
+        </p>
+        <div class="hero-badge">
+            <span class="live-dot"></span>
+            Интерактивный каталог
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="section-heading">
+            <div>
+                <p class="eyebrow">СООБЩЕСТВО</p>
+                <h2>Наши пользователи</h2>
+                <p class="section-description">
+                    Выберите профиль, чтобы прочитать публикации
+                </p>
+            </div>
+            <div class="users-count" id="usersCount">10 профилей</div>
+        </section>
+
+        <div id="status" class="status">
+            <span class="spinner"></span>
+            Загружаем пользователей...
+        </div>
+
+        <div id="users" class="users-container"></div>
+
+        <footer>
+            <span class="footer-mark">✦</span>
+            PeopleSpace
+            <span class="footer-separator">·</span>
+            Создано с помощью Fetch API
+        </footer>
+    </main>
+</body>
+</html>
