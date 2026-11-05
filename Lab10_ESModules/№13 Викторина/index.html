@@ -1,0 +1,41 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Викторина</title>
+    <link rel="stylesheet" href="./styles/style.css">
+</head>
+<body>
+
+    <main class="quiz-container">
+        <h1>Интеллектуальная викторина</h1>
+        <p class="subtitle">Проверь свои знания!</p>
+
+        <div class="progress-info">
+            <span id="questionNumber">Вопрос 1 из 5</span>
+            <span id="score">Баллы: 0</span>
+        </div>
+
+        <div class="progress-bar">
+            <div id="progress" class="progress"></div>
+        </div>
+
+        <section id="quiz">
+            <h2 id="question">Загрузка вопроса...</h2>
+            <div id="answers" class="answers"></div>
+            <p id="feedback"></p>
+            <button id="nextBtn" disabled>Следующий вопрос</button>
+        </section>
+
+        <section id="result" class="result hidden">
+            <h2>Викторина завершена!</h2>
+            <p id="finalScore"></p>
+            <button id="restartBtn">Пройти заново</button>
+        </section>
+    </main>
+
+    <script type="module" src="./src/main.js"></script>
+</body>
+</html>

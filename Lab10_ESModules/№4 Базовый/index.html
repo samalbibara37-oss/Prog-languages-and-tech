@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Калькулятор геометрии</title>
+    <link rel="stylesheet" href="./styles/style.css">
+</head>
+<body>
+
+    <div class="container">
+        <h1>Калькулятор геометрии</h1>
+        <p>Вычисление площади и периметра фигур</p>
+
+        <section>
+            <h2>Прямоугольник</h2>
+
+            <label>Длина:
+                <input type="number" id="length" placeholder="Введите длину">
+            </label>
+
+            <label>Ширина:
+                <input type="number" id="width" placeholder="Введите ширину">
+            </label>
+
+            <button id="rectangleBtn">Вычислить</button>
+
+            <p id="rectangleResult"></p>
+        </section>
+
+        <section>
+            <h2>Круг</h2>
+
+            <label>Радиус:
+                <input type="number" id="radius" placeholder="Введите радиус">
+            </label>
+
+            <button id="circleBtn">Вычислить</button>
+
+            <p id="circleResult"></p>
+        </section>
+    </div>
+
+    <script type="module" src="./src/main.js"></script>
+
+</body>
+</html>

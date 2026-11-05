@@ -1,0 +1,155 @@
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.quiz-container {
+    background: white;
+    width: 100%;
+    max-width: 650px;
+    padding: 35px;
+    border-radius: 20px;
+    box-shadow: 0 10px 35px rgba(0, 0, 0, 0.2);
+}
+
+h1 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 8px;
+}
+
+.subtitle {
+    text-align: center;
+    color: #777;
+    margin-bottom: 30px;
+}
+
+.progress-info {
+    display: flex;
+    justify-content: space-between;
+    color: #555;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.progress-bar {
+    height: 10px;
+    background: #e5e5e5;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 30px;
+}
+
+.progress {
+    height: 100%;
+    width: 0;
+    background: #667eea;
+    transition: width 0.3s;
+}
+
+h2 {
+    color: #333;
+    font-size: 21px;
+    margin-bottom: 25px;
+}
+
+.answers {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.answer-btn {
+    padding: 15px;
+    border: 2px solid #ddd;
+    border-radius: 10px;
+    background: white;
+    cursor: pointer;
+    text-align: left;
+    font-size: 16px;
+    transition: 0.2s;
+}
+
+.answer-btn:hover:not(:disabled) {
+    border-color: #667eea;
+    background: #f3f4ff;
+}
+
+.answer-btn:disabled {
+    cursor: default;
+}
+
+.answer-btn.correct {
+    background: #d8f8df;
+    border-color: #28a745;
+}
+
+.answer-btn.wrong {
+    background: #ffe0e0;
+    border-color: #dc3545;
+}
+
+#feedback {
+    min-height: 24px;
+    font-weight: bold;
+    margin-top: 20px;
+}
+
+#nextBtn,
+#restartBtn {
+    width: 100%;
+    padding: 15px;
+    margin-top: 15px;
+    border: none;
+    border-radius: 10px;
+    background: #667eea;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+#nextBtn:disabled {
+    background: #aaa;
+    cursor: not-allowed;
+}
+
+#nextBtn:hover:not(:disabled),
+#restartBtn:hover {
+    background: #5265c5;
+}
+
+.result {
+    text-align: center;
+    padding: 20px 0;
+}
+
+.result p {
+    font-size: 22px;
+    font-weight: bold;
+    color: #667eea;
+}
+
+.hidden {
+    display: none;
+}
+
+@media (max-width: 500px) {
+    .quiz-container {
+        padding: 22px;
+    }
+
+    h1 {
+        font-size: 24px;
+    }
+}

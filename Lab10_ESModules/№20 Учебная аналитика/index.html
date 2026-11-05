@@ -1,0 +1,99 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Учебная аналитика</title>
+    <link rel="stylesheet" href="./styles/style.css">
+</head>
+<body>
+
+    <main class="container">
+        <header>
+            <h1>Учебная аналитика</h1>
+            <p>Анализ успеваемости студентов</p>
+        </header>
+
+        <section class="statistics">
+            <div class="stat-card">
+                <span>Всего студентов</span>
+                <strong id="totalStudents">0</strong>
+            </div>
+
+            <div class="stat-card">
+                <span>Средний балл</span>
+                <strong id="averageScore">0</strong>
+            </div>
+
+            <div class="stat-card">
+                <span>Лучший результат</span>
+                <strong id="highestScore">0</strong>
+            </div>
+
+            <div class="stat-card">
+                <span>Успеваемость от 50 баллов</span>
+                <strong id="passedStudents">0</strong>
+            </div>
+            <div class="stat-card">
+                <span>Худший результат</span>
+                <strong id="lowestScore">0</strong>
+            </div>
+        </section>
+
+        <section class="filters">
+            <h2>Фильтры</h2>
+
+            <input
+                type="text"
+                id="searchInput"
+                placeholder="Поиск по имени студента..."
+            >
+
+            <select id="groupFilter">
+                <option value="all">Все группы</option>
+                <option value="БДа-22">БДа-22</option>
+                <option value="БДа-23">БДа-23</option>
+                <option value="ИС-22">ИС-22</option>
+            </select>
+
+            <input
+                type="number"
+                id="minScore"
+                placeholder="Минимальный балл"
+                min="0"
+                max="100"
+            >
+
+            <button id="resetBtn">Сбросить фильтры</button>
+        </section>
+
+        <section class="students-section">
+            <h2>Список студентов</h2>
+            <p id="studentCount">Найдено студентов: 0</p>
+
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>№</th>
+                            <th>Ф.И.О.</th>
+                            <th>Группа</th>
+                            <th>Балл</th>
+                            <th>Результат</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="studentsTable"></tbody>
+                </table>
+            </div>
+
+            <p id="emptyMessage" class="empty hidden">
+                Студенты не найдены.
+            </p>
+        </section>
+    </main>
+
+    <script type="module" src="./src/main.js"></script>
+</body>
+</html>
